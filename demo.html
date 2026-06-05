@@ -385,6 +385,74 @@
     }
     .progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .5s}
 
+    /* ============ USERS ONLINE SCREEN ============ */
+    .online-banner{
+      background:linear-gradient(135deg,#0f172a,#1e3a8a);
+      padding:14px 16px;color:#fff;flex-shrink:0;
+    }
+    .ob-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .ob-title{font-size:.95rem;font-weight:700}
+    .ob-live{
+      display:flex;align-items:center;gap:5px;
+      font-size:.7rem;font-weight:600;
+      background:rgba(255,255,255,.12);padding:3px 10px;border-radius:20px;
+    }
+    .live-dot{
+      width:7px;height:7px;background:#4ade80;border-radius:50%;
+      animation:pulse 1.4s infinite;flex-shrink:0;
+    }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .ob-counters{display:flex;gap:8px}
+    .ob-cnt{
+      flex:1;background:rgba(255,255,255,.1);border-radius:8px;
+      padding:8px;text-align:center;
+    }
+    .ob-cnt-val{font-size:1.3rem;font-weight:800;display:block}
+    .ob-cnt-label{font-size:.6rem;opacity:.75}
+    .users-section-title{
+      padding:8px 12px 4px;font-size:.68rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);
+    }
+    .user-row{
+      display:flex;align-items:center;gap:10px;
+      padding:9px 14px;border-bottom:1px solid var(--gray-100);
+    }
+    .user-avatar{
+      width:32px;height:32px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:.85rem;font-weight:700;color:#fff;flex-shrink:0;
+    }
+    .user-info{flex:1}
+    .user-name{font-size:.8rem;font-weight:700;color:var(--gray-900)}
+    .user-detail{font-size:.65rem;color:var(--gray-600);margin-top:1px}
+    .user-status{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+    .us-dot{
+      width:8px;height:8px;border-radius:50%;flex-shrink:0;
+    }
+    .us-dot.online{background:#4ade80}
+    .us-dot.offline{background:var(--gray-400)}
+    .us-time{font-size:.62rem;color:var(--gray-400)}
+    .activity-item{
+      display:flex;gap:8px;padding:7px 14px;border-bottom:1px solid var(--gray-100);
+      animation:fadeIn .4s ease;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+    .ai-icon{font-size:.85rem;flex-shrink:0;margin-top:1px}
+    .ai-text{font-size:.72rem;color:var(--gray-700);flex:1;line-height:1.4}
+    .ai-time{font-size:.62rem;color:var(--gray-400);white-space:nowrap;margin-top:1px}
+    .capacity-bar{
+      margin:8px 12px;background:var(--gray-100);border-radius:6px;height:8px;
+    }
+    .capacity-fill{
+      height:100%;border-radius:6px;
+      background:linear-gradient(90deg,#4ade80,#22c55e);
+      transition:width .5s;
+    }
+    .capacity-label{
+      display:flex;justify-content:space-between;
+      font-size:.65rem;color:var(--gray-600);margin:4px 12px 10px;
+    }
+
     /* TOAST */
     .toast{
       position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
@@ -464,7 +532,10 @@
       <div class="app-bar">
         <span style="font-size:1.2rem">🛡️</span>
         <h2>SafetyInspect KZ</h2>
-        <span class="badge-offline">📡 Онлайн</span>
+        <span class="badge-offline" onclick="gotoTab('v-users',null)" style="cursor:pointer">
+          <span class="live-dot" style="display:inline-block;margin-right:3px"></span>
+          <span id="online-count">47</span> онлайн
+        </span>
       </div>
       <div class="content">
         <div class="home-greeting">
@@ -513,7 +584,39 @@
         <button class="tab active" onclick="gotoTab('v-home',this)"><span class="tab-icon">🏠</span>Главная</button>
         <button class="tab" onclick="gotoTab('v-actions',this)"><span class="tab-icon">✅</span>Задачи</button>
         <button class="tab" onclick="gotoTab('v-dashboard',this)"><span class="tab-icon">📊</span>Дашборд</button>
-        <button class="tab" onclick="showToast('Настройки в разработке')"><span class="tab-icon">⚙️</span>Настройки</button>
+        <button class="tab" onclick="gotoTab('v-users',this)"><span class="tab-icon">👥</span>Сессии</button>
+      </div>
+    </div>
+
+    <!-- ===== USERS ONLINE ===== -->
+    <div class="view" id="v-users">
+      <div class="status-bar"><span>9:41</span><div class="signal"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>
+      <div class="online-banner">
+        <div class="ob-row">
+          <span class="ob-title">👥 Активные сессии</span>
+          <span class="ob-live"><span class="live-dot"></span> Live</span>
+        </div>
+        <div class="ob-counters">
+          <div class="ob-cnt"><span class="ob-cnt-val" id="cnt-online">47</span><span class="ob-cnt-label">Онлайн</span></div>
+          <div class="ob-cnt"><span class="ob-cnt-val" id="cnt-inspecting">12</span><span class="ob-cnt-label">В инспекции</span></div>
+          <div class="ob-cnt"><span class="ob-cnt-val">50</span><span class="ob-cnt-label">Макс. лицензия</span></div>
+        </div>
+      </div>
+      <div style="padding:6px 12px 0;flex-shrink:0">
+        <div class="capacity-bar"><div class="capacity-fill" id="cap-fill" style="width:94%"></div></div>
+        <div class="capacity-label"><span>Нагрузка сервера</span><span id="cap-label">47 / 50 слотов</span></div>
+      </div>
+      <div class="content" id="users-content">
+        <div class="users-section-title">Сейчас в системе</div>
+        <div id="users-list"></div>
+        <div class="users-section-title" style="margin-top:4px">Лента активности <span id="act-count" class="notif">0</span></div>
+        <div id="activity-feed"></div>
+      </div>
+      <div class="tab-bar">
+        <button class="tab" onclick="gotoTab('v-home',this)"><span class="tab-icon">🏠</span>Главная</button>
+        <button class="tab" onclick="gotoTab('v-actions',this)"><span class="tab-icon">✅</span>Задачи</button>
+        <button class="tab" onclick="gotoTab('v-dashboard',this)"><span class="tab-icon">📊</span>Дашборд</button>
+        <button class="tab active" onclick="gotoTab('v-users',this)"><span class="tab-icon">👥</span>Сессии</button>
       </div>
     </div>
 
@@ -652,7 +755,7 @@
         <button class="tab" onclick="gotoTab('v-home',this)"><span class="tab-icon">🏠</span>Главная</button>
         <button class="tab" onclick="gotoTab('v-actions',this)"><span class="tab-icon">✅</span>Задачи</button>
         <button class="tab active" onclick="gotoTab('v-dashboard',this)"><span class="tab-icon">📊</span>Дашборд</button>
-        <button class="tab" onclick="showToast('Настройки в разработке')"><span class="tab-icon">⚙️</span>Настройки</button>
+        <button class="tab" onclick="gotoTab('v-users',this)"><span class="tab-icon">👥</span>Сессии</button>
       </div>
     </div>
 
@@ -668,7 +771,7 @@
         <button class="tab" onclick="gotoTab('v-home',this)"><span class="tab-icon">🏠</span>Главная</button>
         <button class="tab active" onclick="gotoTab('v-actions',this)"><span class="tab-icon">✅</span>Задачи</button>
         <button class="tab" onclick="gotoTab('v-dashboard',this)"><span class="tab-icon">📊</span>Дашборд</button>
-        <button class="tab" onclick="showToast('Настройки в разработке')"><span class="tab-icon">⚙️</span>Настройки</button>
+        <button class="tab" onclick="gotoTab('v-users',this)"><span class="tab-icon">👥</span>Сессии</button>
       </div>
     </div>
 
@@ -1134,6 +1237,109 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
+// ===================== MULTI-USER SIMULATION =====================
+const FAKE_USERS = [
+  {name:'Асет Нурланов',   role:'Инспектор',   section:'Охрана труда',      color:'#1d4ed8', status:'inspecting', ago:'сейчас'},
+  {name:'Жанар Ахметова',  role:'Инспектор',   section:'Пожарная безопасность', color:'#7c3aed', status:'inspecting', ago:'1 мин'},
+  {name:'Марат Сейткали',  role:'Исполнитель',  section:'Устраняет нарушение', color:'#0891b2', status:'online',     ago:'2 мин'},
+  {name:'Дина Касымова',   role:'Инспектор',   section:'Электробезопасность', color:'#be185d', status:'inspecting', ago:'3 мин'},
+  {name:'Руслан Байжанов', role:'Руководитель', section:'Смотрит дашборд',    color:'#15803d', status:'online',     ago:'4 мин'},
+  {name:'Айгерим Токова',  role:'Инспектор',   section:'Промышленная безопасность', color:'#b45309', status:'inspecting', ago:'5 мин'},
+  {name:'Ерлан Омаров',   role:'Исполнитель',  section:'Загружает фото',     color:'#0369a1', status:'online',     ago:'6 мин'},
+  {name:'Сауле Жумабаева', role:'Инспектор',   section:'Транспортная безопасность', color:'#9333ea', status:'inspecting', ago:'7 мин'},
+];
+
+const ACTIVITY_TEMPLATES = [
+  (u)=>({icon:'📋', text:`<strong>${u}</strong> начал инспекцию «Охрана труда» · Цех №2`}),
+  (u)=>({icon:'❌', text:`<strong>${u}</strong> зафиксировал нарушение: «Огнетушитель просрочен»`}),
+  (u)=>({icon:'✅', text:`<strong>${u}</strong> завершил инспекцию · 2 нарушения`}),
+  (u)=>({icon:'📄', text:`<strong>${u}</strong> сформировал PDF-акт и отправил руководителю`}),
+  (u)=>({icon:'📷', text:`<strong>${u}</strong> загрузил фото-доказательство устранения`}),
+  (u)=>({icon:'🔁', text:`<strong>${u}</strong> синхронизировал 3 офлайн-инспекции`}),
+  (u)=>({icon:'📊', text:`<strong>${u}</strong> открыл дашборд за текущий месяц`}),
+  (u)=>({icon:'✔️', text:`<strong>${u}</strong> закрыл мероприятие «Выдать СИЗ сварщикам»`}),
+];
+
+let activityLog = [];
+let actCount = 0;
+let onlineCount = 47;
+let inspectingCount = 12;
+
+function renderUsersScreen() {
+  // Users list
+  const listEl = document.getElementById('users-list');
+  if(!listEl) return;
+  listEl.innerHTML = FAKE_USERS.map(u=>`
+    <div class="user-row">
+      <div class="user-avatar" style="background:${u.color}">${u.name.charAt(0)}</div>
+      <div class="user-info">
+        <div class="user-name">${u.name}</div>
+        <div class="user-detail">${u.role} · ${u.section}</div>
+      </div>
+      <div class="user-status">
+        <div class="us-dot online"></div>
+        <span class="us-time">${u.ago}</span>
+      </div>
+    </div>
+    <div style="padding:2px 14px 6px;margin-left:52px;font-size:.62rem;color:var(--gray-400)">
+      + ещё ${Math.floor(Math.random()*5+3)} пользователей...
+    </div>
+  `).slice(0,4).join('') + `
+    <div style="padding:8px 14px;text-align:center;font-size:.72rem;color:var(--gray-600);background:var(--gray-50);border-top:1px solid var(--gray-100)">
+      ... и ещё <strong>${onlineCount - 4}</strong> активных пользователей
+    </div>
+  `;
+
+  // Activity feed (last 6)
+  const feedEl = document.getElementById('activity-feed');
+  if(feedEl) {
+    feedEl.innerHTML = activityLog.slice(0,6).map(a=>`
+      <div class="activity-item">
+        <span class="ai-icon">${a.icon}</span>
+        <span class="ai-text">${a.text}</span>
+        <span class="ai-time">${a.time}</span>
+      </div>
+    `).join('') || '<div style="padding:16px;text-align:center;font-size:.78rem;color:var(--gray-400)">Ожидание активности...</div>';
+  }
+}
+
+function pushActivity() {
+  const user = FAKE_USERS[Math.floor(Math.random()*FAKE_USERS.length)];
+  const tpl = ACTIVITY_TEMPLATES[Math.floor(Math.random()*ACTIVITY_TEMPLATES.length)];
+  const ev = tpl(user.name);
+  const now = new Date();
+  const time = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  activityLog.unshift({icon:ev.icon, text:ev.text, time});
+  if(activityLog.length > 20) activityLog.pop();
+  actCount++;
+
+  // Fluctuate online count
+  onlineCount = 45 + Math.floor(Math.random()*6);
+  inspectingCount = 10 + Math.floor(Math.random()*5);
+  const cap = Math.round((onlineCount/50)*100);
+
+  // Update counters everywhere
+  const oc = document.getElementById('online-count');
+  if(oc) oc.textContent = onlineCount;
+  const co = document.getElementById('cnt-online');
+  if(co) co.textContent = onlineCount;
+  const ci = document.getElementById('cnt-inspecting');
+  if(ci) ci.textContent = inspectingCount;
+  const cf = document.getElementById('cap-fill');
+  if(cf) cf.style.width = cap+'%';
+  const cl2 = document.getElementById('cap-label');
+  if(cl2) cl2.textContent = onlineCount+' / 50 слотов';
+  const ac = document.getElementById('act-count');
+  if(ac) { ac.textContent = actCount; ac.style.display = actCount>0?'':'none'; }
+
+  renderUsersScreen();
+}
+
+// Start simulation
+setInterval(pushActivity, 3000);
+setTimeout(pushActivity, 500); // first event quickly
+
+// ===================== INIT =====================
 // Init
 renderDashboard('week');
 renderActions();

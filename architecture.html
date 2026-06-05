@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafetyInspect KZ — Архитектура 50+ пользователей</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#1d4ed8;--primary-dark:#1e3a8a;--primary-light:#eff6ff;
+      --green:#16a34a;--green-light:#f0fdf4;
+      --red:#dc2626;--yellow:#d97706;
+      --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+      --gray-400:#94a3b8;--gray-600:#475569;--gray-900:#0f172a;
+    }
+    body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-900);line-height:1.6}
+    .container{max-width:1060px;margin:0 auto;padding:0 24px}
+    a{color:var(--primary);text-decoration:none}
+
+    /* NAV */
+    nav{background:#fff;border-bottom:1px solid var(--gray-200);padding:0 24px;position:sticky;top:0;z-index:10}
+    .nav-inner{max-width:1060px;margin:0 auto;height:56px;display:flex;align-items:center;gap:16px}
+    .nav-logo{font-weight:800;font-size:1rem;display:flex;align-items:center;gap:6px}
+    .nav-links{margin-left:auto;display:flex;gap:20px;font-size:.88rem}
+    .nav-links a{color:var(--gray-600);font-weight:500}
+    .nav-links a:hover{color:var(--primary)}
+
+    /* HERO */
+    .hero{background:linear-gradient(135deg,var(--gray-900) 0%,var(--primary-dark) 100%);color:#fff;padding:56px 0 48px}
+    .hero h1{font-size:2rem;font-weight:800;margin-bottom:12px}
+    .hero p{font-size:1.05rem;opacity:.8;max-width:620px;margin-bottom:24px}
+    .hero-chips{display:flex;gap:10px;flex-wrap:wrap}
+    .chip{padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:700;background:rgba(255,255,255,.12);color:#fff}
+    .chip.green{background:#14532d;color:#4ade80}
+
+    /* SECTION */
+    section{padding:56px 0}
+    section+section{padding-top:0}
+    h2{font-size:1.5rem;font-weight:800;margin-bottom:8px}
+    .sub{color:var(--gray-600);margin-bottom:32px;font-size:.95rem}
+
+    /* ARCH DIAGRAM */
+    .arch{background:#fff;border-radius:16px;padding:32px;border:1px solid var(--gray-200);margin-bottom:32px}
+    .arch-layers{display:flex;flex-direction:column;gap:12px}
+    .layer{display:flex;gap:10px;align-items:stretch}
+    .layer-label{
+      width:130px;flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;
+      font-size:.72rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;
+      letter-spacing:.04em;text-align:right;padding-right:12px;
+      border-right:2px solid var(--gray-200);
+    }
+    .layer-boxes{display:flex;gap:8px;flex:1;flex-wrap:wrap}
+    .box{
+      padding:10px 14px;border-radius:8px;font-size:.78rem;font-weight:600;
+      display:flex;flex-direction:column;gap:3px;min-width:100px;
+    }
+    .box-title{font-weight:700;font-size:.82rem}
+    .box-sub{font-size:.68rem;opacity:.7;font-weight:400}
+    .box-blue{background:var(--primary-light);color:var(--primary)}
+    .box-green{background:var(--green-light);color:var(--green)}
+    .box-purple{background:#faf5ff;color:#7c3aed}
+    .box-orange{background:#fff7ed;color:#c2410c}
+    .box-gray{background:var(--gray-100);color:var(--gray-700)}
+    .box-dark{background:var(--gray-900);color:#fff}
+    .arrow-down{text-align:center;font-size:1.2rem;color:var(--gray-400);margin:2px 0}
+
+    /* CHANGES TABLE */
+    .changes{display:flex;flex-direction:column;gap:16px;margin-bottom:32px}
+    .change-card{
+      background:#fff;border-radius:12px;border:1px solid var(--gray-200);
+      padding:20px 24px;display:flex;gap:20px;align-items:flex-start;
+    }
+    .change-num{
+      width:36px;height:36px;border-radius:50%;background:var(--primary);color:#fff;
+      font-weight:800;display:flex;align-items:center;justify-content:center;
+      font-size:.9rem;flex-shrink:0;
+    }
+    .change-body h3{font-size:.95rem;font-weight:700;margin-bottom:6px}
+    .change-body p{font-size:.85rem;color:var(--gray-600);margin-bottom:8px}
+    .code{
+      background:var(--gray-900);color:#e2e8f0;
+      padding:10px 14px;border-radius:8px;font-size:.72rem;
+      font-family:'Courier New',monospace;line-height:1.6;
+      white-space:pre;overflow-x:auto;
+    }
+    .tag{
+      display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;
+      border-radius:4px;margin-right:6px;margin-bottom:4px;
+    }
+    .tag-blue{background:var(--primary-light);color:var(--primary)}
+    .tag-green{background:var(--green-light);color:var(--green)}
+    .tag-orange{background:#fff7ed;color:#c2410c}
+
+    /* CAPACITY TABLE */
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--gray-200)}
+    thead{background:var(--gray-900);color:#fff}
+    th{padding:10px 16px;text-align:left;font-size:.8rem;font-weight:700}
+    td{padding:10px 16px;font-size:.82rem;border-bottom:1px solid var(--gray-100)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--gray-50)}
+    .ok{color:var(--green);font-weight:700}
+    .warn{color:var(--yellow);font-weight:700}
+    .bad{color:var(--red);font-weight:700}
+
+    /* FOOTER */
+    footer{background:var(--gray-900);color:var(--gray-400);padding:24px;text-align:center;font-size:.82rem}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">🛡️ SafetyInspect KZ</div>
+    <div class="nav-links">
+      <a href="index.html">← Главная</a>
+      <a href="demo.html">▶ Демо</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="container">
+    <h1>Архитектура для 50+ одновременных пользователей</h1>
+    <p>Что нужно изменить в стеке и инфраструктуре, чтобы приложение стабильно работало при одновременном входе 50 и более сотрудников.</p>
+    <div class="hero-chips">
+      <span class="chip">50+ concurrent users</span>
+      <span class="chip">On-premise · Docker</span>
+      <span class="chip">PostgreSQL + Redis</span>
+      <span class="chip green">✓ Офлайн-режим сохраняется</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <h2>Архитектура системы</h2>
+    <p class="sub">Трёхуровневая схема с балансировщиком нагрузки, кластером Node.js и Redis-кешем</p>
+
+    <div class="arch">
+      <div class="arch-layers">
+
+        <div class="layer">
+          <div class="layer-label">Клиенты</div>
+          <div class="layer-boxes">
+            <div class="box box-blue"><span class="box-title">📱 Flutter App</span><span class="box-sub">iOS / Android · 50 устройств</span></div>
+            <div class="box box-blue"><span class="box-title">🌐 Веб-дашборд</span><span class="box-sub">Руководители · браузер</span></div>
+            <div class="box box-gray"><span class="box-title">📴 Офлайн SQLite</span><span class="box-sub">drift · локально на устройстве</span></div>
+          </div>
+        </div>
+
+        <div class="arrow-down">↓ HTTPS / WSS</div>
+
+        <div class="layer">
+          <div class="layer-label">Edge</div>
+          <div class="layer-boxes">
+            <div class="box box-dark"><span class="box-title">⚖️ Nginx</span><span class="box-sub">Reverse proxy · Load balancer · SSL termination</span></div>
+          </div>
+        </div>
+
+        <div class="arrow-down">↓ Round-robin</div>
+
+        <div class="layer">
+          <div class="layer-label">API кластер</div>
+          <div class="layer-boxes">
+            <div class="box box-green"><span class="box-title">🟢 Node.js #1</span><span class="box-sub">PM2 · порт 3001</span></div>
+            <div class="box box-green"><span class="box-title">🟢 Node.js #2</span><span class="box-sub">PM2 · порт 3002</span></div>
+            <div class="box box-green"><span class="box-title">🟢 Node.js #3</span><span class="box-sub">PM2 · порт 3003</span></div>
+            <div class="box box-gray"><span class="box-title">➕ Auto-scale</span><span class="box-sub">При нагрузке > 70%</span></div>
+          </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <div class="layer">
+          <div class="layer-label">Кеш / очередь</div>
+          <div class="layer-boxes">
+            <div class="box box-orange"><span class="box-title">🔴 Redis</span><span class="box-sub">Session store · JWT-кеш · Pub/Sub · Bull Queue</span></div>
+            <div class="box box-orange"><span class="box-title">🔴 Bull Queue</span><span class="box-sub">Очередь фото-загрузок · Sync jobs</span></div>
+          </div>
+        </div>
+
+        <div class="arrow-down">↓</div>
+
+        <div class="layer">
+          <div class="layer-label">Хранилище</div>
+          <div class="layer-boxes">
+            <div class="box box-purple"><span class="box-title">🐘 PostgreSQL</span><span class="box-sub">Primary + Replica · pg-pool: 20 conn/node</span></div>
+            <div class="box box-purple"><span class="box-title">🗂️ MinIO</span><span class="box-sub">S3-совместимый · фото нарушений</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Что меняется для 50+ пользователей</h2>
+    <p class="sub">8 конкретных изменений в коде и инфраструктуре относительно базового MVP</p>
+
+    <div class="changes">
+
+      <div class="change-card">
+        <div class="change-num">1</div>
+        <div class="change-body">
+          <h3>PM2 Cluster Mode — несколько процессов Node.js</h3>
+          <p>Один Node.js-процесс ограничен одним CPU-ядром. При 50 одновременных запросах он создаёт очередь. PM2 запускает по одному процессу на каждое ядро сервера.</p>
+          <span class="tag tag-orange">ecosystem.config.js</span>
+          <div class="code">module.exports = {
+  apps: [{
+    name: 'safetyinspect-api',
+    script: 'src/server.js',
+    instances: 'max',       // по числу CPU ядер
+    exec_mode: 'cluster',   // shared port, round-robin
+    max_memory_restart: '512M',
+    env: { NODE_ENV: 'production', PORT: 3000 }
+  }]
+};</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">2</div>
+        <div class="change-body">
+          <h3>Пул соединений PostgreSQL (pg-pool)</h3>
+          <p>Без пула каждый запрос открывает новое соединение к БД. При 50 пользователях — 50 одновременных соединений. Пул управляет ними переиспользуя существующие.</p>
+          <span class="tag tag-blue">src/db/pool.js</span>
+          <div class="code">const { Pool } = require('pg');
+
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  max: 20,            // макс. соединений на процесс
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+module.exports = pool;</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">3</div>
+        <div class="change-body">
+          <h3>Redis для JWT-сессий</h3>
+          <p>При нескольких Node.js-процессах сессии нельзя хранить в памяти одного процесса. Redis — общее хранилище для всех воркеров. Также кешируем токены чтобы не проверять подпись каждый раз.</p>
+          <span class="tag tag-blue">src/middleware/auth.js</span>
+          <div class="code">const redis = require('../redis');
+
+async function verifyToken(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  // Проверяем кеш (избегаем crypto-операции)
+  const cached = await redis.get(`jwt:${token}`);
+  if (cached) {
+    req.user = JSON.parse(cached);
+    return next();
+  }
+
+  const payload = jwt.verify(token, process.env.JWT_SECRET);
+  await redis.setex(`jwt:${token}`, 3600, JSON.stringify(payload));
+  req.user = payload;
+  next();
+}</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">4</div>
+        <div class="change-body">
+          <h3>Nginx — балансировщик и Rate Limiting</h3>
+          <p>Nginx принимает все запросы и распределяет по Node.js процессам. Rate limiting защищает от случайной перегрузки (например, баг в клиенте отправляет 1000 синхронизаций).</p>
+          <span class="tag tag-orange">nginx/nginx.conf</span>
+          <div class="code">upstream api_cluster {
+    least_conn;                 # к наименее нагруженному
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002;
+    server 127.0.0.1:3003;
+    keepalive 32;
+}
+
+limit_req_zone $binary_remote_addr zone=api:10m rate=30r/s;
+
+server {
+    listen 443 ssl http2;
+    location /api/ {
+        limit_req zone=api burst=50 nodelay;
+        proxy_pass http://api_cluster;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">5</div>
+        <div class="change-body">
+          <h3>Bull Queue для загрузки фото</h3>
+          <p>50 инспекторов могут одновременно закончить инспекции и начать загружать фото. Очередь Bull (через Redis) обрабатывает их по 5-10 штук параллельно, не перегружая диск и сеть.</p>
+          <span class="tag tag-blue">src/queues/photoQueue.js</span>
+          <div class="code">const Queue = require('bull');
+const photoQueue = new Queue('photo-upload', { redis: redisConfig });
+
+// Producer: при получении фото от клиента
+photoQueue.add({ inspectionId, photoBase64, violationId },
+  { attempts: 3, backoff: 5000 }
+);
+
+// Consumer: обрабатывает 5 фото параллельно
+photoQueue.process(5, async (job) => {
+  const { photoBase64, violationId } = job.data;
+  const url = await minioClient.upload(photoBase64);
+  await db.query(
+    'UPDATE violations SET photo_url=$1 WHERE id=$2',
+    [url, violationId]
+  );
+});</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">6</div>
+        <div class="change-body">
+          <h3>WebSocket через Redis Pub/Sub</h3>
+          <p>Дашборд руководителя обновляется в реальном времени. Когда инспектор на процессе #1 завершает инспекцию — руководитель подключён к процессу #3. Redis Pub/Sub передаёт событие между воркерами.</p>
+          <span class="tag tag-blue">src/realtime/ws.js</span>
+          <div class="code">const { createAdapter } = require('@socket.io/redis-adapter');
+const pubClient = redis.duplicate();
+const subClient = redis.duplicate();
+
+io.adapter(createAdapter(pubClient, subClient));
+
+// Когда инспекция завершена — публикуем событие
+io.to(`branch:${branchId}`).emit('inspection:completed', {
+  inspectorName, violationsCount, section
+});
+
+// Клиент (Flutter Web / браузер)
+socket.on('inspection:completed', (data) => {
+  updateDashboard(data); // живое обновление без перезагрузки
+});</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">7</div>
+        <div class="change-body">
+          <h3>MinIO вместо локального диска для фото</h3>
+          <p>При нескольких Node.js процессах файл сохранённый процессом #1 недоступен через процесс #3. MinIO — S3-совместимое on-premise хранилище, доступное всем воркерам.</p>
+          <span class="tag tag-blue">src/storage/minio.js</span>
+          <div class="code">const Minio = require('minio');
+const minio = new Minio.Client({
+  endPoint: 'minio.local',
+  port: 9000,
+  useSSL: false,
+  accessKey: process.env.MINIO_ACCESS,
+  secretKey: process.env.MINIO_SECRET,
+});
+
+async function uploadPhoto(buffer, filename) {
+  await minio.putObject('violations', filename, buffer);
+  return `http://minio.local/violations/${filename}`;
+}</div>
+        </div>
+      </div>
+
+      <div class="change-card">
+        <div class="change-num">8</div>
+        <div class="change-body">
+          <h3>Индексы PostgreSQL для быстрых запросов дашборда</h3>
+          <p>При 50 пользователях в базе быстро накапливаются тысячи записей. Без индексов запрос дашборда будет делать full-table scan на каждое открытие.</p>
+          <span class="tag tag-purple">migrations/add_indexes.sql</span>
+          <div class="code">-- Дашборд: инспекции за период
+CREATE INDEX idx_inspections_branch_date
+  ON inspections(branch_id, conducted_at DESC);
+
+-- Нарушения по статусу
+CREATE INDEX idx_violations_status
+  ON violations(status, created_at DESC);
+
+-- Мероприятия: просроченные
+CREATE INDEX idx_actions_due_status
+  ON corrective_actions(due_date, status)
+  WHERE status NOT IN ('closed');</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Требования к серверу</h2>
+    <p class="sub">Минимальные и рекомендуемые характеристики on-premise сервера</p>
+    <table>
+      <thead>
+        <tr><th>Параметр</th><th>MVP (до 10 чел.)</th><th>Пилот (50 чел.)</th><th>Масштаб (200+ чел.)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CPU</td><td>2 ядра</td><td class="ok">4 ядра (рек. 8)</td><td>16+ ядер / кластер</td></tr>
+        <tr><td>RAM</td><td>4 GB</td><td class="ok">8 GB (рек. 16)</td><td>32+ GB</td></tr>
+        <tr><td>Диск</td><td>50 GB SSD</td><td class="ok">200 GB SSD</td><td>1 TB+ SSD RAID</td></tr>
+        <tr><td>PostgreSQL соед.</td><td>10</td><td class="ok">60 (3 × pool 20)</td><td>PgBouncer + пул</td></tr>
+        <tr><td>Node.js воркеры</td><td>1</td><td class="ok">4–8 (PM2 cluster)</td><td>Docker Swarm</td></tr>
+        <tr><td>Redis</td><td>Не нужен</td><td class="ok">512 MB instance</td><td>Redis Sentinel HA</td></tr>
+        <tr><td>Пропускная способность</td><td>10 Мбит/с</td><td class="ok">100 Мбит/с</td><td>Гбит/с</td></tr>
+        <tr><td>Резервное копирование</td><td>Ручное</td><td class="ok">Ежедневно авто (pg_dump)</td><td>Streaming replica</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Docker Compose для пилота</h2>
+    <p class="sub">Готовый шаблон развёртывания всей инфраструктуры одной командой</p>
+    <div class="code" style="background:var(--gray-900);color:#e2e8f0;padding:20px 24px;border-radius:12px;font-size:.78rem;line-height:1.7">version: '3.9'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports: ["443:443"]
+    volumes: ["./nginx/nginx.conf:/etc/nginx/nginx.conf"]
+    depends_on: [api1, api2, api3]
+
+  api1:
+    build: ./backend
+    environment: { PORT: 3001, DB_HOST: postgres, REDIS_HOST: redis }
+    depends_on: [postgres, redis]
+
+  api2:
+    build: ./backend
+    environment: { PORT: 3002, DB_HOST: postgres, REDIS_HOST: redis }
+
+  api3:
+    build: ./backend
+    environment: { PORT: 3003, DB_HOST: postgres, REDIS_HOST: redis }
+
+  postgres:
+    image: postgres:15-alpine
+    volumes: ["pg_data:/var/lib/postgresql/data"]
+    environment: { POSTGRES_DB: safetyinspect, POSTGRES_USER: app }
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    volumes: ["minio_data:/data"]
+
+volumes:
+  pg_data:
+  minio_data:</div>
+  </div>
+</section>
+
+<section style="padding-bottom:64px">
+  <div class="container">
+    <h2>Итог: что даёт эта архитектура</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px">
+      <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid var(--gray-200)">
+        <div style="font-size:1.5rem;margin-bottom:8px">⚡</div>
+        <h3 style="margin-bottom:6px">Производительность</h3>
+        <p style="font-size:.85rem;color:var(--gray-600)">50 одновременных запросов обрабатываются за &lt;200 мс. PDF генерируется ≤5 с даже при пиковой нагрузке.</p>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid var(--gray-200)">
+        <div style="font-size:1.5rem;margin-bottom:8px">🛡️</div>
+        <h3 style="margin-bottom:6px">Надёжность</h3>
+        <p style="font-size:.85rem;color:var(--gray-600)">Падение одного Node.js-воркера не роняет систему. Nginx автоматически исключает упавший процесс из пула.</p>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid var(--gray-200)">
+        <div style="font-size:1.5rem;margin-bottom:8px">📡</div>
+        <h3 style="margin-bottom:6px">Офлайн не ломается</h3>
+        <p style="font-size:.85rem;color:var(--gray-600)">50 человек могут синхронизировать офлайн-данные одновременно. Bull Queue ставит их в очередь, ни одна инспекция не теряется.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>🛡️ SafetyInspect KZ · Архитектурная документация · MVP v1.0 · РК 2025</footer>
+</body>
+</html>
