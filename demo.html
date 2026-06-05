@@ -179,6 +179,27 @@
     .hs-val{font-size:1.3rem;font-weight:800;color:var(--gray-900);display:block}
     .hs-label{font-size:.65rem;color:var(--gray-600)}
 
+    /* ============ OBJECT SCREEN ============ */
+    .obj-body{padding:16px}
+    .obj-section-label{
+      font-size:.68rem;font-weight:700;text-transform:uppercase;
+      letter-spacing:.06em;color:var(--gray-400);margin:14px 0 8px;
+    }
+    .obj-field{margin-bottom:12px}
+    .obj-field label{font-size:.75rem;font-weight:600;color:var(--gray-700);display:block;margin-bottom:4px}
+    .obj-field input,.obj-field select{
+      width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);
+      border-radius:8px;font-size:.85rem;outline:none;background:#fff;
+      transition:border-color .2s;font-family:inherit;
+    }
+    .obj-field input:focus,.obj-field select:focus{border-color:var(--primary)}
+    .obj-info-card{
+      background:var(--primary-light);border:1px solid #bfdbfe;
+      border-radius:8px;padding:10px 12px;margin-bottom:14px;
+      font-size:.75rem;color:var(--primary);
+    }
+    .obj-info-card strong{display:block;font-size:.8rem;margin-bottom:2px}
+
     /* ============ CHECKLIST SCREEN ============ */
     .cl-progress{
       background:var(--gray-100);height:4px;flex-shrink:0;
@@ -496,6 +517,60 @@
       </div>
     </div>
 
+    <!-- ===== OBJECT INFO ===== -->
+    <div class="view" id="v-object">
+      <div class="status-bar"><span>9:41</span><div class="signal"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>
+      <div class="app-bar">
+        <button class="back-btn" onclick="goto('v-home')">‹</button>
+        <h2 id="obj-section-title">Охрана труда</h2>
+        <span class="badge-offline">📴 Офлайн</span>
+      </div>
+      <div class="content">
+        <div class="obj-body">
+          <div class="obj-info-card">
+            <strong>📋 Шаг 1 из 2 — Данные объекта</strong>
+            Укажите место и подразделение перед началом инспекции
+          </div>
+
+          <div class="obj-section-label">Объект проверки</div>
+
+          <div class="obj-field">
+            <label>Адрес объекта *</label>
+            <input type="text" id="obj-address" placeholder="г. Алматы, ул. Абая 100, Цех №3"/>
+          </div>
+          <div class="obj-field">
+            <label>Наименование объекта *</label>
+            <input type="text" id="obj-name" placeholder="Цех №3 — Участок сварки"/>
+          </div>
+
+          <div class="obj-section-label">Организация</div>
+
+          <div class="obj-field">
+            <label>Наименование филиала / подразделения *</label>
+            <select id="obj-branch">
+              <option value="">— Выберите подразделение —</option>
+              <option>АО «КазМунайГаз» · Алматинский филиал</option>
+              <option>АО «КазМунайГаз» · Карагандинский филиал</option>
+              <option>АО «КазМунайГаз» · Атырауский филиал</option>
+              <option>ТОО «АрселорМиттал» · Темиртауский завод</option>
+              <option>ТОО «Казцинк» · Усть-Каменогорский филиал</option>
+            </select>
+          </div>
+          <div class="obj-field">
+            <label>Структурное подразделение</label>
+            <input type="text" id="obj-dept" placeholder="Производственный отдел / Смена А"/>
+          </div>
+          <div class="obj-field">
+            <label>Ответственный за объект</label>
+            <input type="text" id="obj-responsible" placeholder="ФИО ответственного лица"/>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-bar">
+        <button class="btn-primary" onclick="confirmObject()">Начать инспекцию →</button>
+      </div>
+    </div>
+
     <!-- ===== CHECKLIST ===== -->
     <div class="view" id="v-checklist">
       <div class="status-bar"><span>9:41</span><div class="signal"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div></div>
@@ -683,6 +758,7 @@ let currentChecklist = 0;
 let currentItem = 0;
 let answers = [];
 let violations = [];
+let objectInfo = {address:'',name:'',branch:'',dept:'',responsible:''};
 
 // ===================== NAVIGATION =====================
 function goto(id) {
@@ -728,10 +804,29 @@ function login() {
 // ===================== CHECKLIST =====================
 function startChecklist(idx) {
   currentChecklist = idx;
+  const cl = CHECKLISTS[idx];
+  document.getElementById('obj-section-title').textContent = cl.icon+' '+cl.title;
+  goto('v-object');
+}
+
+function confirmObject() {
+  const address = document.getElementById('obj-address').value.trim();
+  const name    = document.getElementById('obj-name').value.trim();
+  const branch  = document.getElementById('obj-branch').value;
+  if(!address){ showToast('⚠️ Укажите адрес объекта'); return; }
+  if(!name)   { showToast('⚠️ Укажите наименование объекта'); return; }
+  if(!branch) { showToast('⚠️ Выберите филиал / подразделение'); return; }
+  objectInfo = {
+    address,
+    name,
+    branch,
+    dept: document.getElementById('obj-dept').value.trim() || '—',
+    responsible: document.getElementById('obj-responsible').value.trim() || '—',
+  };
   currentItem = 0;
   answers = [];
   violations = [];
-  const cl = CHECKLISTS[idx];
+  const cl = CHECKLISTS[currentChecklist];
   document.getElementById('cl-title').textContent = cl.icon+' '+cl.title;
   renderItem();
   goto('v-checklist');
@@ -833,7 +928,18 @@ function showSummary() {
   document.getElementById('sum-viol').textContent = vcount;
   document.getElementById('sum-index').textContent = idx+'%';
 
-  let html = '';
+  let html = `
+    <div style="margin:10px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:10px 12px;font-size:.75rem;">
+      <div style="font-weight:700;color:var(--gray-700);margin-bottom:6px">📍 Данные объекта</div>
+      <div style="display:flex;flex-direction:column;gap:3px;color:var(--gray-600)">
+        <div><strong>Адрес:</strong> ${objectInfo.address}</div>
+        <div><strong>Объект:</strong> ${objectInfo.name}</div>
+        <div><strong>Филиал:</strong> ${objectInfo.branch}</div>
+        <div><strong>Подразделение:</strong> ${objectInfo.dept}</div>
+        <div><strong>Ответственный:</strong> ${objectInfo.responsible}</div>
+      </div>
+    </div>
+  `;
   if(vcount===0) {
     html = '<div style="padding:24px;text-align:center;color:var(--green)"><div style="font-size:2rem">🎉</div><div style="font-weight:700;margin-top:8px">Нарушений не обнаружено!</div></div>';
   } else {
@@ -878,16 +984,26 @@ function renderPDF() {
   document.getElementById('pdf-content').innerHTML = `
     <div class="pdf-page">
       <div class="pdf-header-row">
-        <div><div class="pdf-org">🛡️ SafetyInspect KZ</div><div style="font-size:.65rem;color:var(--gray-600)">Завод «КазМунайГаз» · Алматы</div></div>
+        <div>
+          <div class="pdf-org">🛡️ SafetyInspect KZ</div>
+          <div style="font-size:.65rem;color:var(--gray-600)">${objectInfo.branch||'—'}</div>
+        </div>
         <div class="pdf-date">${today}</div>
       </div>
       <div class="pdf-title">АКТ ИНСПЕКЦИИ<br/><span style="font-size:.75rem;font-weight:500;color:var(--gray-600)">${cl.title}</span></div>
       <div class="pdf-section">
         <div class="pdf-section-title">Общие сведения</div>
         <div class="pdf-row"><span class="pdf-label">Инспектор:</span><span class="pdf-value">Асет Нурланов</span></div>
-        <div class="pdf-row"><span class="pdf-label">Объект:</span><span class="pdf-value">Цех №3, Участок А</span></div>
         <div class="pdf-row"><span class="pdf-label">Дата:</span><span class="pdf-value">${today}</span></div>
         <div class="pdf-row"><span class="pdf-label">Раздел:</span><span class="pdf-value">${cl.title}</span></div>
+      </div>
+      <div class="pdf-section">
+        <div class="pdf-section-title">Объект проверки</div>
+        <div class="pdf-row"><span class="pdf-label">Адрес:</span><span class="pdf-value">${objectInfo.address||'—'}</span></div>
+        <div class="pdf-row"><span class="pdf-label">Объект:</span><span class="pdf-value">${objectInfo.name||'—'}</span></div>
+        <div class="pdf-row"><span class="pdf-label">Филиал:</span><span class="pdf-value">${objectInfo.branch||'—'}</span></div>
+        <div class="pdf-row"><span class="pdf-label">Подразделение:</span><span class="pdf-value">${objectInfo.dept||'—'}</span></div>
+        <div class="pdf-row"><span class="pdf-label">Ответственный:</span><span class="pdf-value">${objectInfo.responsible||'—'}</span></div>
       </div>
       <div class="pdf-section">
         <div class="pdf-section-title">Результаты</div>
