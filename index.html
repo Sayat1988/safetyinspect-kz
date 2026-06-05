@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafetyInspect KZ — Цифровые инспекции по ОТ и ПБ</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container nav__inner">
+      <a href="#" class="nav__logo">
+        <span class="logo-icon">🛡️</span>
+        <span>SafetyInspect <strong>KZ</strong></span>
+      </a>
+      <ul class="nav__links">
+        <li><a href="#features">Возможности</a></li>
+        <li><a href="#how">Как работает</a></li>
+        <li><a href="#stack">Технологии</a></li>
+        <li><a href="#timeline">Сроки</a></li>
+      </ul>
+      <a href="#contact" class="btn btn--primary nav__cta">Запросить демо</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__text">
+        <span class="badge">MVP · Пилот на заводе</span>
+        <h1>Цифровые инспекции<br/>по охране труда<br/>и промбезопасности</h1>
+        <p class="hero__sub">
+          SafetyInspect KZ заменяет бумажные чек-листы и Excel. Инспектор проводит
+          проверку офлайн, система генерирует PDF-акт со ссылками на НПА РК и
+          автоматически назначает корректирующие мероприятия.
+        </p>
+        <div class="hero__actions">
+          <a href="#features" class="btn btn--primary btn--lg">Посмотреть возможности</a>
+          <a href="#how" class="btn btn--outline btn--lg">Как это работает</a>
+        </div>
+        <div class="hero__stats">
+          <div class="stat">
+            <span class="stat__val">5</span>
+            <span class="stat__label">разделов НПА РК</span>
+          </div>
+          <div class="stat">
+            <span class="stat__val">&lt;5 с</span>
+            <span class="stat__label">генерация PDF</span>
+          </div>
+          <div class="stat">
+            <span class="stat__val">100%</span>
+            <span class="stat__label">офлайн-режим</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero__visual">
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <div class="app-header">
+              <span class="app-title">Инспекция #47</span>
+              <span class="app-badge offline">Офлайн</span>
+            </div>
+            <div class="checklist-item done">
+              <span class="ci-icon">✅</span>
+              <span class="ci-text">Вводный инструктаж проведён</span>
+            </div>
+            <div class="checklist-item violation">
+              <span class="ci-icon">❌</span>
+              <span class="ci-text">Аптечка первой помощи</span>
+              <div class="ci-npa">ТК РК, ст. 182</div>
+            </div>
+            <div class="checklist-item done">
+              <span class="ci-icon">✅</span>
+              <span class="ci-text">Пожарный выход свободен</span>
+            </div>
+            <div class="checklist-item na">
+              <span class="ci-icon">—</span>
+              <span class="ci-text">Газовое оборудование</span>
+            </div>
+            <div class="checklist-item violation">
+              <span class="ci-icon">❌</span>
+              <span class="ci-text">СИЗ у сварщиков</span>
+              <div class="ci-npa">Закон №528-II</div>
+            </div>
+            <div class="app-footer">
+              <span>2 нарушения · 4/12 пунктов</span>
+              <button class="app-btn">Далее →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <h2 class="section-title">Проблема</h2>
+      <p class="section-sub">Инспекторы по ОТ и ПБ ведут проверки вручную — на бумаге или в Excel</p>
+      <div class="problem__grid">
+        <div class="problem-card">
+          <div class="problem-icon">📋</div>
+          <h3>Потеря данных</h3>
+          <p>Бумажные акты теряются, Excel-файлы не синхронизируются между сотрудниками</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">⏰</div>
+          <h3>Задержки оформления</h3>
+          <p>30–60 минут на оформление одного акта. Ссылки на НПА ищутся вручную</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">🔍</div>
+          <h3>Нет контроля</h3>
+          <p>Нарушения фиксируются, но устранение никто не отслеживает системно</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">📊</div>
+          <h3>Нет аналитики</h3>
+          <p>Руководство не видит общую картину безопасности в реальном времени</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Возможности</h2>
+      <p class="section-sub">Всё что нужно инспектору — в одном приложении</p>
+      <div class="features__grid">
+
+        <div class="feature-card feature-card--large">
+          <div class="feature-icon">📝</div>
+          <h3>Цифровые чек-листы</h3>
+          <p>5 разделов по НПА РК через единый JSON-движок. Ответ «Нет» — автоматически требует комментарий и фото. Ссылка на НПА подставляется из данных.</p>
+          <ul class="feature-list">
+            <li>Охрана труда и здоровья</li>
+            <li>Пожарная безопасность</li>
+            <li>Электробезопасность</li>
+            <li>Транспортная безопасность</li>
+            <li>Промышленная безопасность</li>
+          </ul>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h3>PDF-акт за 5 секунд</h3>
+          <p>Автоматическая генерация акта с нарушениями, фото и ссылками на НПА. Отправка по Email / WhatsApp / Telegram.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📡</div>
+          <h3>100% офлайн</h3>
+          <p>Работает без интернета на территории завода. При появлении сети — автосинхронизация с сервером.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">✅</div>
+          <h3>Корректирующие мероприятия</h3>
+          <p>Автоназначение задач по нарушениям. Push-уведомления за 3 дня до срока. Жизненный цикл: Открыто → В работе → Закрыто.</p>
+        </div>
+
+        <div class="feature-card feature-card--large">
+          <div class="feature-icon">📊</div>
+          <h3>Дашборд для руководителя</h3>
+          <p>Полная картина безопасности предприятия в реальном времени.</p>
+          <div class="dashboard-preview">
+            <div class="kpi-cards">
+              <div class="kpi">
+                <span class="kpi-val">24</span>
+                <span class="kpi-label">Инспекций</span>
+              </div>
+              <div class="kpi">
+                <span class="kpi-val">47</span>
+                <span class="kpi-label">Нарушений</span>
+              </div>
+              <div class="kpi">
+                <span class="kpi-val">38</span>
+                <span class="kpi-label">Устранено</span>
+              </div>
+              <div class="kpi kpi--green">
+                <span class="kpi-val">81%</span>
+                <span class="kpi-label">Индекс безопасности</span>
+              </div>
+            </div>
+            <div class="bar-chart">
+              <div class="bar-row"><span class="bar-label">Охрана труда</span><div class="bar-track"><div class="bar-fill" style="width:70%">14</div></div></div>
+              <div class="bar-row"><span class="bar-label">Пожарная</span><div class="bar-track"><div class="bar-fill" style="width:45%">9</div></div></div>
+              <div class="bar-row"><span class="bar-label">Электро</span><div class="bar-track"><div class="bar-fill" style="width:35%">7</div></div></div>
+              <div class="bar-row"><span class="bar-label">Транспортная</span><div class="bar-track"><div class="bar-fill" style="width:55%">11</div></div></div>
+              <div class="bar-row"><span class="bar-label">Промбезопасность</span><div class="bar-track"><div class="bar-fill bar-fill--red" style="width:30%">6</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="container">
+      <h2 class="section-title">Как это работает</h2>
+      <p class="section-sub">От начала инспекции до закрытия нарушения — автоматически</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h3>Инспектор входит в приложение</h3>
+          <p>Авторизация по логину/паролю (JWT). Выбирает объект и раздел чек-листа.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h3>Проводит инспекцию</h3>
+          <p>Отвечает на вопросы, фотографирует нарушения. Работает офлайн — данные в SQLite.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h3>Генерирует акт</h3>
+          <p>PDF формируется за &lt;5 секунд с нарушениями, фото и ссылками на НПА РК.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h3>Исполнитель устраняет</h3>
+          <p>Получает задачу с дедлайном, загружает фотодоказательство устранения.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <h3>Руководитель контролирует</h3>
+          <p>Видит все KPI на дашборде. При появлении сети данные синхронизируются автоматически.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIFECYCLE -->
+  <section class="lifecycle">
+    <div class="container">
+      <h2 class="section-title">Жизненный цикл нарушения</h2>
+      <div class="lifecycle__flow">
+        <div class="lc-step lc--red">
+          <div class="lc-dot"></div>
+          <span class="lc-status">Открыто</span>
+          <span class="lc-desc">Нарушение зафиксировано</span>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-step lc--yellow">
+          <div class="lc-dot"></div>
+          <span class="lc-status">В работе</span>
+          <span class="lc-desc">Исполнитель принял</span>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-step lc--blue">
+          <div class="lc-dot"></div>
+          <span class="lc-status">На проверке</span>
+          <span class="lc-desc">Заявлено выполнение</span>
+        </div>
+        <div class="lc-arrow">→</div>
+        <div class="lc-step lc--green">
+          <div class="lc-dot"></div>
+          <span class="lc-status">Закрыто</span>
+          <span class="lc-desc">Инспектор подтвердил</span>
+        </div>
+      </div>
+      <p class="lifecycle__note">При истечении срока статус автоматически меняется на <strong style="color:#b91c1c">Просрочено</strong> с ежедневными уведомлениями</p>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="stack" id="stack">
+    <div class="container">
+      <h2 class="section-title">Технологический стек</h2>
+      <div class="stack__grid">
+        <div class="stack-group">
+          <h3>Мобильное приложение</h3>
+          <div class="tech-tags">
+            <span class="tech">Flutter</span>
+            <span class="tech">Dart</span>
+            <span class="tech">Material 3</span>
+            <span class="tech">Riverpod</span>
+            <span class="tech">drift (SQLite)</span>
+            <span class="tech">Dio</span>
+            <span class="tech">go_router</span>
+            <span class="tech">fl_chart</span>
+          </div>
+        </div>
+        <div class="stack-group">
+          <h3>Бэкенд</h3>
+          <div class="tech-tags">
+            <span class="tech">Node.js</span>
+            <span class="tech">Express</span>
+            <span class="tech">PostgreSQL</span>
+            <span class="tech">JWT</span>
+          </div>
+        </div>
+        <div class="stack-group">
+          <h3>Развёртывание</h3>
+          <div class="tech-tags">
+            <span class="tech">Docker</span>
+            <span class="tech">On-premise</span>
+            <span class="tech">GitLab CI</span>
+          </div>
+        </div>
+        <div class="stack-group">
+          <h3>Платформы</h3>
+          <div class="tech-tags">
+            <span class="tech">Android 8+</span>
+            <span class="tech">iOS 14+</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="timeline" id="timeline">
+    <div class="container">
+      <h2 class="section-title">План разработки</h2>
+      <p class="section-sub">6–7 недель до первой реальной инспекции</p>
+      <div class="timeline__list">
+        <div class="tl-item">
+          <div class="tl-week">Нед 1</div>
+          <div class="tl-content">
+            <h3>Подготовка</h3>
+            <p>Стек, проект, навигация, CI/CD</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-week">Нед 2</div>
+          <div class="tl-content">
+            <h3>Авторизация</h3>
+            <p>Вход, роли, главный экран с 5 разделами</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-week">Нед 3–4</div>
+          <div class="tl-content">
+            <h3>Чек-листы</h3>
+            <p>JSON-движок, все 5 разделов, фото, офлайн-режим</p>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-week">Нед 5</div>
+          <div class="tl-content">
+            <h3>PDF и сервер</h3>
+            <p>Генерация акта, API, офлайн-очередь синхронизации</p>
+          </div>
+        </div>
+        <div class="tl-item tl-item--last">
+          <div class="tl-week">Нед 6–7</div>
+          <div class="tl-content">
+            <h3>Дашборд + QA</h3>
+            <p>Виджеты, тестирование на заводе, правки</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USERS -->
+  <section class="users">
+    <div class="container">
+      <h2 class="section-title">Роли пользователей</h2>
+      <div class="users__grid">
+        <div class="user-card">
+          <div class="user-icon">👷</div>
+          <h3>Инспектор по ОТ/ПБ</h3>
+          <p>Основной пользователь, работает в поле. Проводит инспекцию, фиксирует нарушения, генерирует акт.</p>
+        </div>
+        <div class="user-card">
+          <div class="user-icon">👔</div>
+          <h3>Руководитель по БиОТ</h3>
+          <p>Смотрит дашборд, контролирует мероприятия. Просматривает отчёты, утверждает мероприятия.</p>
+        </div>
+        <div class="user-card">
+          <div class="user-icon">🔧</div>
+          <h3>Ответственный исполнитель</h3>
+          <p>Устраняет нарушения. Получает задачи с дедлайнами, загружает фотодоказательства выполнения.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="container contact__inner">
+      <h2>Готовы запустить пилот?</h2>
+      <p>Развернём приложение на вашем предприятии за 6–7 недель. On-premise, без передачи данных третьим лицам.</p>
+      <a href="mailto:info@safetyinspect.kz" class="btn btn--white btn--lg">Запросить демо →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="nav__logo"><span class="logo-icon">🛡️</span> SafetyInspect KZ</span>
+      <span class="footer__copy">© 2025 · MVP v1.0 · Республика Казахстан</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
