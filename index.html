@@ -432,18 +432,18 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
   <div style="padding:10px 12px 12px;flex-shrink:0">
     <button class="btn-primary" id="fin-btn" onclick="finishChecklist()" disabled>
       <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      Завершить и сформировать акт
+      Завершить и сформировать указание
     </button>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════
-     ЭКРАН 6 — АКТ СФОРМИРОВАН
+     ЭКРАН 6 — УКАЗАНИЕ СФОРМИРОВАНО
 ═══════════════════════════════════════ -->
 <div class="screen" id="sc-act">
   <div class="topbar">
     <button class="btn-icon" onclick="goHome()" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-    <div class="topbar-title">Акт сформирован</div>
+    <div class="topbar-title">Указание сформировано</div>
   </div>
   <div class="scrollable">
     <div style="background:var(--green-lt);border-bottom:1px solid #86EFAC;padding:14px;display:flex;align-items:center;gap:12px">
@@ -451,8 +451,9 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
         <svg style="width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div>
-        <div style="font-size:15px;font-weight:800;color:#1A4D22" id="act-title-label">Акт инспекции</div>
+        <div style="font-size:15px;font-weight:800;color:#1A4D22" id="act-title-label">Указание по ПБ</div>
         <div style="font-size:12px;color:var(--green);margin-top:2px" id="act-date-label"></div>
+        <div style="font-size:13px;font-weight:800;color:#1A5FA8;margin-top:4px;background:#E8F1FB;display:inline-block;padding:3px 10px;border-radius:20px" id="act-num-label"></div>
       </div>
     </div>
     <div class="act-summary">
@@ -470,7 +471,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
       </button>
       <button class="btn-secondary" onclick="generatePdf()">
         <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Скачать PDF-акт
+        Скачать PDF-указание
       </button>
     </div>
   </div>
@@ -486,22 +487,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
   </div>
   <div class="scrollable">
     <div class="sec-hdr" style="padding-top:12px">Ответственный руководитель</div>
-    <div class="fcard">
-      <div class="mgr-row" onclick="selMgr(this,'АС','Асанов Серик Болатович','Руководитель ДПБ-филиала')" id="mgr-0">
-        <div class="mgr-ava" style="background:var(--blue-lt);color:var(--blue)">АС</div>
-        <div><div class="mgr-name">Асанов Серик Болатович</div><div class="mgr-role">Руководитель ДПБ-филиала</div></div>
-        <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
-      </div>
-      <div class="mgr-row" onclick="selMgr(this,'НК','Нурланов Кайрат Сейткалиевич','Зам. руководителя по ПБ')" id="mgr-1">
-        <div class="mgr-ava" style="background:var(--purple-lt);color:var(--purple)">НК</div>
-        <div><div class="mgr-name">Нурланов Кайрат Сейткалиевич</div><div class="mgr-role">Зам. руководителя по ПБ</div></div>
-        <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
-      </div>
-      <div class="mgr-row" onclick="selMgr(this,'ДМ','Джаксыбекова Молдир Ахметовна','Начальник отдела ОТ')" id="mgr-2">
-        <div class="mgr-ava" style="background:var(--teal-lt);color:var(--teal)">ДМ</div>
-        <div><div class="mgr-name">Джаксыбекова Молдир Ахметовна</div><div class="mgr-role">Начальник отдела ОТ</div></div>
-        <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
-      </div>
+    <div class="fcard" id="mgr-list-send">
     </div>
 
     <div class="sec-hdr">Канал уведомления</div>
@@ -521,11 +507,11 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
     <div class="sec-hdr">Маршрут согласования</div>
     <div class="fcard">
       <div class="tl">
-        <div class="tl-item"><div class="tl-spine"><div class="tl-dot done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Инспектор заполнил акт</div><div class="tl-sub">Сейткали А.М. · 10.06.2026</div><span class="tl-badge" style="background:var(--green-lt);color:var(--green)">Выполнено</span></div></div>
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Инспектор заполнил указание</div><div class="tl-sub">Сейткали А.М. · 10.06.2026</div><span class="tl-badge" style="background:var(--green-lt);color:var(--green)">Выполнено</span></div></div>
         <div class="tl-item"><div class="tl-spine"><div class="tl-dot active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Направление на исполнение</div><div class="tl-sub">Ожидает отправки руководителю</div><span class="tl-badge" style="background:var(--blue-lt);color:var(--blue)">Текущий шаг</span></div></div>
         <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Принятие руководителем</div><div class="tl-sub">Назначение исполнителей</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
         <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Устранение нарушений</div><div class="tl-sub">Исполнители загружают фото-подтверждения</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
-        <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div><div class="tl-body" style="padding-bottom:4px"><div class="tl-title">Закрытие акта инспектором</div><div class="tl-sub">Подтверждение устранения нарушений</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div><div class="tl-body" style="padding-bottom:4px"><div class="tl-title">Закрытие указания инспектором</div><div class="tl-sub">Подтверждение устранения нарушений</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
       </div>
     </div>
 
@@ -548,7 +534,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
   <div class="scrollable">
     <div class="sent-hero">
       <div class="sent-ico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-      <div class="sent-title">Акт направлен на исполнение</div>
+      <div class="sent-title">Указание направлено на исполнение</div>
       <div class="sent-sub" id="sent-sub">Руководитель получил уведомление</div>
     </div>
     <div class="sec-hdr">Уведомления отправлены</div>
@@ -559,7 +545,7 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
     </div>
     <div class="notif-card">
       <div class="notif-ico" style="background:var(--green-lt);color:var(--green)"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-      <div style="flex:1"><div class="notif-title">Email с PDF-актом</div><div class="notif-sub" id="notif-e">Акт и предписание во вложении</div><div class="notif-time">Только что · Отправлено</div></div>
+      <div style="flex:1"><div class="notif-title">Email с PDF-указанием</div><div class="notif-sub" id="notif-e">Указание и предписание во вложении</div><div class="notif-time">Только что · Отправлено</div></div>
       <div class="ok-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
     </div>
     <div class="sec-hdr">Мероприятия по устранению</div>
@@ -787,23 +773,52 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
      ЭКРАН 11 — ПРОФИЛЬ
 ═══════════════════════════════════════ -->
 <div class="screen" id="sc-profile">
-  <div class="topbar"><div class="topbar-title">Профиль</div></div>
+  <div class="topbar">
+    <div class="topbar-title">Профиль</div>
+    <button class="btn-icon" onclick="openEditProfile()" aria-label="Редактировать">
+      <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>
+  </div>
   <div class="scrollable">
+    <!-- Карточка инспектора -->
     <div style="display:flex;align-items:center;gap:14px;padding:20px 14px;background:var(--white);border-bottom:1px solid var(--gray100)">
-      <div class="prof-ava">АС</div>
+      <div class="prof-ava" id="prof-ava-initials">АС</div>
       <div>
-        <div style="font-size:17px;font-weight:800;color:var(--gray800)">Айдос Сейткали</div>
-        <div style="font-size:13px;color:var(--gray400)">Инспектор по ОТ/ПБ</div>
-        <div style="font-size:12px;color:var(--gray400);margin-top:1px">ДПБ-филиал АО «Казахтелеком» · Астана</div>
+        <div style="font-size:17px;font-weight:800;color:var(--gray800)" id="prof-display-name">Айдос Сейткали</div>
+        <div style="font-size:13px;color:var(--gray400)" id="prof-display-role">Инспектор по ОТ/ПБ</div>
+        <div style="font-size:12px;color:var(--gray400);margin-top:1px" id="prof-display-org">ДПБ-филиал АО «Казахтелеком» · Астана</div>
       </div>
     </div>
-    <div style="background:var(--white);margin-top:8px">
+
+    <!-- Секция: руководители -->
+    <div class="sec-hdr">Ответственные руководители</div>
+    <div id="mgr-list-profile" style="padding:0 12px 4px"></div>
+    <div style="padding:0 12px 12px">
+      <button class="btn-secondary" onclick="showScreen('sc-add-mgr')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Добавить руководителя
+      </button>
+    </div>
+
+    <!-- Секция: инспекторы по БиОТ -->
+    <div class="sec-hdr">Инспекторы по БиОТ</div>
+    <div id="insp-list-profile" style="padding:0 12px 4px"></div>
+    <div style="padding:0 12px 12px">
+      <button class="btn-secondary" onclick="showScreen('sc-add-insp')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Добавить инспектора
+      </button>
+    </div>
+
+    <!-- Настройки -->
+    <div class="sec-hdr">Настройки</div>
+    <div style="background:var(--white);margin:0 12px 10px;border-radius:var(--r-lg);border:1px solid var(--gray200);overflow:hidden">
       <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M12 20h.01"/></svg></div><span class="prof-lbl">Офлайн-режим</span><span class="prof-val on">Включён</span></div>
       <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><span class="prof-lbl">Push-уведомления</span><span class="prof-val on">Включены</span></div>
       <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></div><span class="prof-lbl">Синхронизация</span><span class="prof-val">2 мин. назад</span></div>
       <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><span class="prof-lbl">Версия</span><span class="prof-val">1.0.0</span></div>
     </div>
-    <div style="padding:12px">
+    <div style="padding:0 12px 20px">
       <button class="btn-secondary" style="color:var(--red);border-color:var(--red)" onclick="doLogout()">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
         Выйти из аккаунта
@@ -815,6 +830,91 @@ html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Ro
     <button class="ntab" onclick="mainTab('dash')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Дашборд</button>
     <button class="ntab" onclick="mainTab('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>История</button>
     <button class="ntab on" onclick="mainTab('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 12 — РЕДАКТИРОВАТЬ ПРОФИЛЬ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-edit-profile">
+  <div class="topbar">
+    <button class="btn-icon" onclick="showScreen('sc-profile')" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title">Мой профиль</div>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr" style="padding-top:12px">Личные данные</div>
+    <div class="fcard">
+      <div class="field req"><div class="flbl">Ф.И.О.</div><input class="finp" id="ep-name" placeholder="Фамилия Имя Отчество" type="text"></div>
+      <div class="field req"><div class="flbl">Должность</div><input class="finp" id="ep-role" placeholder="Инспектор по ОТ/ПБ" type="text"></div>
+      <div class="field"><div class="flbl">Организация / филиал</div><input class="finp" id="ep-org" placeholder="АО «Казахтелеком» · ДПБ-филиал" type="text"></div>
+      <div class="field"><div class="flbl">Телефон</div><input class="finp" id="ep-phone" placeholder="+7 (___) ___-__-__" type="tel"></div>
+      <div class="field"><div class="flbl">Email</div><input class="finp" id="ep-email" placeholder="email@kt.kz" type="email"></div>
+    </div>
+    <div class="btn-wrap">
+      <button class="btn-primary" onclick="saveProfile()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Сохранить
+      </button>
+      <button class="btn-ghost" onclick="showScreen('sc-profile')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 13 — ДОБАВИТЬ РУКОВОДИТЕЛЯ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-add-mgr">
+  <div class="topbar">
+    <button class="btn-icon" onclick="showScreen('sc-profile')" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title" id="add-mgr-title">Добавить руководителя</div>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr" style="padding-top:12px">Данные руководителя</div>
+    <div class="fcard">
+      <div class="field req"><div class="flbl">Ф.И.О.</div><input class="finp" id="am-name" placeholder="Фамилия Имя Отчество" type="text"></div>
+      <div class="field req"><div class="flbl">Должность</div><input class="finp" id="am-role" placeholder="Руководитель ДПБ-филиала" type="text"></div>
+      <div class="field"><div class="flbl">Филиал / подразделение</div><input class="finp" id="am-org" placeholder="АО «Казахтелеком» · Астана" type="text"></div>
+      <div class="field"><div class="flbl">Телефон</div><input class="finp" id="am-phone" placeholder="+7 (___) ___-__-__" type="tel"></div>
+      <div class="field"><div class="flbl">Email</div><input class="finp" id="am-email" placeholder="email@kt.kz" type="email"></div>
+    </div>
+    <input type="hidden" id="am-edit-idx" value="-1">
+    <div class="err-msg" id="err-am">Заполните Ф.И.О. и должность</div>
+    <div class="btn-wrap">
+      <button class="btn-primary" onclick="saveMgr()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Сохранить
+      </button>
+      <button class="btn-ghost" onclick="showScreen('sc-profile')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 14 — ДОБАВИТЬ ИНСПЕКТОРА
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-add-insp">
+  <div class="topbar">
+    <button class="btn-icon" onclick="showScreen('sc-profile')" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title" id="add-insp-title">Добавить инспектора</div>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr" style="padding-top:12px">Данные инспектора</div>
+    <div class="fcard">
+      <div class="field req"><div class="flbl">Ф.И.О.</div><input class="finp" id="ai-name" placeholder="Фамилия Имя Отчество" type="text"></div>
+      <div class="field req"><div class="flbl">Должность</div><input class="finp" id="ai-role" placeholder="Инспектор по ОТ/ПБ" type="text"></div>
+      <div class="field"><div class="flbl">Филиал / подразделение</div><input class="finp" id="ai-org" placeholder="АО «Казахтелеком» · Астана" type="text"></div>
+      <div class="field"><div class="flbl">Телефон</div><input class="finp" id="ai-phone" placeholder="+7 (___) ___-__-__" type="tel"></div>
+      <div class="field"><div class="flbl">Email</div><input class="finp" id="ai-email" placeholder="email@kt.kz" type="email"></div>
+    </div>
+    <input type="hidden" id="ai-edit-idx" value="-1">
+    <div class="err-msg" id="err-ai">Заполните Ф.И.О. и должность</div>
+    <div class="btn-wrap">
+      <button class="btn-primary" onclick="saveInsp()">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Сохранить
+      </button>
+      <button class="btn-ghost" onclick="showScreen('sc-profile')">Отмена</button>
+    </div>
   </div>
 </div>
 
@@ -922,7 +1022,97 @@ const PERIODS={
 };
 
 // ═══════════════ STATE ═══════════════
-let curSec=null, ans={}, cmts={}, selMgrData=null, actViols=[];
+let curSec=null, ans={}, cmts={}, selMgrData=null, actViols=[], customViols=[];
+
+// ═══════════════ CUSTOM VIOLATIONS ═══════════════
+function renderCustomViols(){
+  const el = document.getElementById('custom-viols-list');
+  if(!el) return;
+  if(!customViols.length){
+    el.innerHTML = '<div style="font-size:12px;color:var(--gray400);text-align:center;padding:8px 0 10px">Иных нарушений не добавлено</div>';
+    return;
+  }
+  el.innerHTML = customViols.map((v,i)=>`
+    <div style="background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--r-sm);padding:10px;margin-bottom:8px" id="cv-card-${i}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.04em">Иное нарушение № ${i+1}</div>
+        <button onclick="removeCustomViol(${i})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:18px;padding:0;line-height:1">×</button>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--gray800);margin-bottom:4px">${v.title||'—'}</div>
+      ${v.desc ? `<div style="font-size:12px;color:var(--gray600);margin-bottom:4px">${v.desc}</div>` : ''}
+      ${v.npa  ? `<div style="font-size:11px;color:var(--blue)">📎 ${v.npa}</div>` : ''}
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button onclick="editCustomViol(${i})" style="flex:1;padding:7px;background:var(--white);border:1px solid var(--gray200);border-radius:var(--r-sm);font-size:12px;color:var(--blue);font-weight:600;cursor:pointer;font-family:inherit">✏️ Изменить</button>
+        <button onclick="removeCustomViol(${i})" style="flex:1;padding:7px;background:var(--white);border:1px solid var(--gray200);border-radius:var(--r-sm);font-size:12px;color:var(--red);font-weight:600;cursor:pointer;font-family:inherit">🗑 Удалить</button>
+      </div>
+    </div>`).join('');
+}
+
+function addCustomViol(){
+  showCustomViolModal(-1, {title:'',desc:'',npa:''});
+}
+
+function editCustomViol(idx){
+  showCustomViolModal(idx, customViols[idx]);
+}
+
+function removeCustomViol(idx){
+  customViols.splice(idx,1);
+  renderCustomViols();
+  updProg(curSec);
+}
+
+function showCustomViolModal(idx, data){
+  // Remove existing modal if any
+  const old = document.getElementById('cv-modal');
+  if(old) old.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'cv-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-end;justify-content:center';
+  modal.innerHTML = `
+    <div style="background:var(--white);border-radius:var(--r-xl) var(--r-xl) 0 0;width:100%;max-width:430px;padding:20px 16px 32px;max-height:85vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:800;color:var(--gray800)">${idx<0?'Добавить иное нарушение':'Редактировать нарушение'}</div>
+        <button onclick="document.getElementById('cv-modal').remove()" style="background:none;border:none;cursor:pointer;font-size:24px;color:var(--gray400);line-height:1">×</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Наименование нарушения *</div>
+          <input id="cv-title" type="text" value="${(data.title||'').replace(/"/g,'&quot;')}" placeholder="Кратко опишите нарушение..." style="width:100%;border:1px solid var(--gray200);border-radius:var(--r-md);padding:11px 13px;font-size:14px;color:var(--gray800);font-family:inherit;outline:none">
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Подробное описание</div>
+          <textarea id="cv-desc" rows="3" placeholder="Детальное описание ситуации..." style="width:100%;border:1px solid var(--gray200);border-radius:var(--r-md);padding:11px 13px;font-size:14px;color:var(--gray800);font-family:inherit;outline:none;resize:none">${data.desc||''}</textarea>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Ссылка на НПА (если применимо)</div>
+          <input id="cv-npa" type="text" value="${(data.npa||'').replace(/"/g,'&quot;')}" placeholder="Например: ТК РК, ст. 184 п. 4" style="width:100%;border:1px solid var(--gray200);border-radius:var(--r-md);padding:11px 13px;font-size:14px;color:var(--gray800);font-family:inherit;outline:none">
+        </div>
+        <div id="cv-err" style="font-size:11px;color:var(--red);display:none">Заполните наименование нарушения</div>
+        <button onclick="saveCustomViol(${idx})" style="width:100%;padding:14px;background:var(--blue);color:var(--white);border:none;border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">
+          ${idx<0?'Добавить нарушение':'Сохранить изменения'}
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  // Focus first field
+  setTimeout(()=>document.getElementById('cv-title').focus(), 100);
+}
+
+function saveCustomViol(idx){
+  const title = document.getElementById('cv-title').value.trim();
+  const desc  = document.getElementById('cv-desc').value.trim();
+  const npa   = document.getElementById('cv-npa').value.trim();
+  if(!title){ document.getElementById('cv-err').style.display='block'; return; }
+  const obj = {title, desc, npa};
+  if(idx < 0) customViols.push(obj);
+  else customViols[idx] = obj;
+  document.getElementById('cv-modal').remove();
+  renderCustomViols();
+  updProg(curSec);
+}
 
 // ═══════════════ NAVIGATION ═══════════════
 function showScreen(id){
@@ -1040,6 +1230,8 @@ function goChooseSection(){
 // ═══════════════ CHECKLIST ═══════════════
 function openChecklist(id){
   curSec=id; ans={}; cmts={};
+  // reset custom violations
+  customViols = [];
   const sec=SECTIONS_DATA.find(s=>s.id===id);
   document.getElementById('cl-title').textContent=sec.title;
   renderItems(id); updProg(id);
@@ -1069,6 +1261,29 @@ function renderItems(id){
         </div>
       </div>
     </div>`).join('');
+
+  // Блок «Иные нарушения» — всегда в конце каждого раздела
+  const extra = document.createElement('div');
+  extra.id = 'custom-viols-block';
+  extra.innerHTML = `
+    <div style="background:var(--white);border:2px dashed var(--gray200);border-radius:var(--r-md);padding:14px;margin-top:4px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg style="width:16px;height:16px;stroke:#B45309;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--gray800)">Иные несоответствия</div>
+          <div style="font-size:11px;color:var(--gray400);margin-top:1px">Нарушения, не отражённые в чек-листе</div>
+        </div>
+      </div>
+      <div id="custom-viols-list"></div>
+      <button onclick="addCustomViol()" style="width:100%;padding:10px;background:var(--amber-lt);border:1px solid #D97706;border-radius:var(--r-sm);font-size:13px;font-weight:700;color:var(--amber);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px">
+        <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Добавить иное нарушение
+      </button>
+    </div>`;
+  document.getElementById('cl-items').appendChild(extra);
+  renderCustomViols();
 }
 
 function setA(i,v){
@@ -1100,37 +1315,72 @@ function finishChecklist(){
   const sec=SECTIONS_DATA.find(s=>s.id===curSec);
   const dateStr=new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
   actViols=viols.map((it,idx)=>({item:it,comment:cmts[items.indexOf(it)]||'',deadline:''}));
+  const totalViols = viols.length + customViols.length;
 
-  document.getElementById('act-title-label').textContent=sec.title;
-  document.getElementById('act-date-label').textContent=`${dateStr} · Инспектор: Сейткали А.М.`;
+  // ── Автонумерация ──────────────────────────────────
+  let actNum = 1;
+  try {
+    const stored = localStorage.getItem('si_act_counter');
+    actNum = stored ? parseInt(stored) + 1 : 1;
+    localStorage.setItem('si_act_counter', actNum);
+  } catch(e){}
+  const year = new Date().getFullYear();
+  const actNumStr = `УПБ-${actNum}-${year}`;
+
+  // Текущий инспектор из профиля
+  const {profile} = loadPeople();
+  const inspName = profile.name || document.getElementById('f-inspector')?.value || 'Сейткали Айдос Маратович';
+
+  document.getElementById('act-title-label').textContent = sec.title;
+  document.getElementById('act-date-label').textContent  = `${dateStr} · Инспектор: ${inspName}`;
+  document.getElementById('act-num-label').textContent   = `№ ${actNumStr}`;
   document.getElementById('a-tot').textContent=items.length;
-  document.getElementById('a-vio').textContent=viols.length;
+  document.getElementById('a-vio').textContent=totalViols;
   document.getElementById('a-ok').textContent=ok;
   document.getElementById('a-na').textContent=na;
 
+  const today=new Date(); const dl=new Date(today); dl.setDate(dl.getDate()+14);
+  const dlStr=dl.toISOString().split('T')[0];
+  actViols.forEach(v=>v.deadline=dlStr);
+
   const vblock=document.getElementById('act-viols');
-  if(!viols.length){
-    vblock.innerHTML='<div style="background:var(--green-lt);border-radius:var(--r-md);padding:13px;text-align:center;color:#1A4D22;font-weight:700;font-size:14px;margin:0 12px 10px">Нарушений не выявлено</div>';
+  let html='';
+
+  if(!totalViols){
+    html='<div style="background:var(--green-lt);border-radius:var(--r-md);padding:13px;text-align:center;color:#1A4D22;font-weight:700;font-size:14px;margin:0 12px 10px">Нарушений не выявлено</div>';
   } else {
-    const today=new Date(); const dl=new Date(today); dl.setDate(dl.getDate()+14);
-    const dlStr=dl.toISOString().split('T')[0];
-    actViols.forEach(v=>v.deadline=dlStr);
-    vblock.innerHTML=viols.map((it,idx)=>{
-      const ci=items.indexOf(it);
-      return `<div class="vio-item" style="margin:0 12px 8px">
-        <div class="vio-n">Нарушение · Пункт ${it.n}</div>
-        <div class="vio-t">${it.t}</div>
-        <div class="vio-npa">${it.npa}</div>
-        <div class="vio-comm">${cmts[ci]||'(комментарий не добавлен)'}</div>
-        <div class="dl-row"><span class="dl-lbl">Срок устранения:</span><input type="date" class="dl-inp" id="dl-${idx}" value="${dlStr}" onchange="actViols[${idx}].deadline=this.value"></div>
-      </div>`;
-    }).join('');
+    // Стандартные нарушения
+    if(viols.length){
+      html+=viols.map((it,idx)=>{
+        const ci=items.indexOf(it);
+        return `<div class="vio-item" style="margin:0 12px 8px">
+          <div class="vio-n">Нарушение по чек-листу · Пункт ${it.n}</div>
+          <div class="vio-t">${it.t}</div>
+          <div class="vio-npa">${it.npa}</div>
+          <div class="vio-comm">${cmts[ci]||'(комментарий не добавлен)'}</div>
+          <div class="dl-row"><span class="dl-lbl">Срок устранения:</span><input type="date" class="dl-inp" id="dl-${idx}" value="${dlStr}" onchange="actViols[${idx}].deadline=this.value"></div>
+        </div>`;
+      }).join('');
+    }
+    // Иные нарушения
+    if(customViols.length){
+      html+=`<div style="margin:6px 12px 6px;font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em">Иные несоответствия (${customViols.length})</div>`;
+      html+=customViols.map((v,idx)=>`
+        <div class="vio-item" style="margin:0 12px 8px;border-color:#D97706">
+          <div class="vio-n" style="color:var(--amber)">Иное нарушение № ${idx+1}</div>
+          <div class="vio-t">${v.title}</div>
+          ${v.desc?`<div class="vio-comm">${v.desc}</div>`:''}
+          ${v.npa?`<div class="vio-npa">${v.npa}</div>`:'<div class="vio-npa" style="color:var(--gray400)">НПА не указан</div>'}
+          <div class="dl-row"><span class="dl-lbl">Срок устранения:</span><input type="date" class="dl-inp" id="dl-cv-${idx}" value="${dlStr}"></div>
+        </div>`).join('');
+    }
   }
+  vblock.innerHTML=html;
 
   // update home stats
   document.getElementById('kh-insp').textContent=parseInt(document.getElementById('kh-insp').textContent)+1;
-  document.getElementById('kh-viol').textContent=parseInt(document.getElementById('kh-viol').textContent)+viols.length;
-  document.getElementById('kh-open').textContent=parseInt(document.getElementById('kh-open').textContent)+viols.length;
+  document.getElementById('kh-viol').textContent=parseInt(document.getElementById('kh-viol').textContent)+totalViols;
+  document.getElementById('kh-open').textContent=parseInt(document.getElementById('kh-open').textContent)+totalViols;
 
   showScreen('sc-act');
 }
@@ -1145,9 +1395,9 @@ function selMgr(row,ava,name,role){
 
 function confirmSend(){
   if(!selMgrData){ document.getElementById('err-mgr').classList.add('show'); return; }
-  document.getElementById('sent-sub').textContent=selMgrData.name+' получил уведомление';
+  document.getElementById('sent-sub').textContent = actNumStr + ' · ' + selMgrData.name+' получил уведомление';
   document.getElementById('notif-p').textContent=selMgrData.name+' · push на телефон';
-  document.getElementById('notif-e').textContent=selMgrData.name+' · акт и предписание во вложении';
+  document.getElementById('notif-e').textContent=selMgrData.name+' · указание и предписание во вложении';
   document.getElementById('sent-mgr-name').textContent=selMgrData.name+' · '+selMgrData.role;
 
   const viols=actViols.filter(v=>v.item);
@@ -1210,6 +1460,7 @@ function generatePdf(){
   const na    = items.filter((_,i) => ans[i] === 'na').length;
   const sec   = SECTIONS_DATA.find(s => s.id === curSec) || {};
   const dateStr = new Date().toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const actNumStr = document.getElementById('act-num-label')?.textContent || '';
 
   // Collect form data
   const city     = document.getElementById('f-city')?.value || '—';
@@ -1218,25 +1469,41 @@ function generatePdf(){
   const region   = document.getElementById('f-region')?.value || '—';
   const filial   = document.getElementById('f-filial')?.value || '—';
   const dept     = document.getElementById('f-dept')?.value || '—';
-  const inspector= document.getElementById('f-inspector')?.value || 'Сейткали Айдос Маратович';
-  const position = document.getElementById('f-position')?.value || 'Инспектор по ОТ/ПБ';
+  const {profile} = loadPeople();
+  const inspector= profile.name  || document.getElementById('f-inspector')?.value || 'Сейткали Айдос Маратович';
+  const position = profile.role  || document.getElementById('f-position')?.value || 'Инспектор по ОТ/ПБ';
   const resp     = document.getElementById('f-resp')?.value || '—';
 
-  const violsHtml = viols.length === 0
-    ? `<tr><td colspan="4" style="text-align:center;color:#2D7A3A;font-weight:700;padding:12px">Нарушений не выявлено</td></tr>`
-    : viols.map((it, idx) => {
-        const ci = items.indexOf(it);
-        const comm = cmts[ci] || '—';
-        const dl = document.getElementById('dl-'+idx)?.value || actViols[idx]?.deadline || '';
-        const dlStr = dl ? new Date(dl).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
-        return `<tr>
-          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${it.n}</td>
-          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${it.t}</td>
-          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:11px;color:#1A5FA8">${it.npa}</td>
-          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${comm}</td>
-          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px;white-space:nowrap">${dlStr}</td>
-        </tr>`;
-      }).join('');
+  const totalViolCount = viols.length + customViols.length;
+
+  const violsHtml = totalViolCount === 0
+    ? `<tr><td colspan="5" style="text-align:center;color:#2D7A3A;font-weight:700;padding:12px">Нарушений не выявлено</td></tr>`
+    : [
+        ...viols.map((it, idx) => {
+          const ci = items.indexOf(it);
+          const comm = cmts[ci] || '—';
+          const dl = document.getElementById('dl-'+idx)?.value || actViols[idx]?.deadline || '';
+          const dlStr = dl ? new Date(dl).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+          return `<tr>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${it.n}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${it.t}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:11px;color:#1A5FA8">${it.npa}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${comm}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px;white-space:nowrap">${dlStr}</td>
+          </tr>`;
+        }),
+        ...customViols.map((v, idx) => {
+          const dl = document.getElementById('dl-cv-'+idx)?.value || '';
+          const dlStr = dl ? new Date(dl).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+          return `<tr style="background:#FFFBEB">
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px;color:#B45309">Иное ${idx+1}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px"><strong>${v.title}</strong>${v.desc?'<br><span style="color:#6B6A67;font-size:11px">'+v.desc+'</span>':''}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:11px;color:#1A5FA8">${v.npa||'—'}</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px;color:#B45309">Иное нарушение</td>
+            <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px;white-space:nowrap">${dlStr}</td>
+          </tr>`;
+        })
+      ].join('');
 
   const allItemsHtml = items.map((it, i) => {
     const a = ans[i];
@@ -1254,7 +1521,7 @@ function generatePdf(){
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Акт инспекции — ${sec.title || ''} — ${dateStr}</title>
+<title>Указание по ПБ ${actNumStr} — ${sec.title || ''} — ${dateStr}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; font-size: 13px; color: #1c1c1e; padding: 20px 28px; }
@@ -1295,16 +1562,19 @@ function generatePdf(){
 <div class="header">
   <div>
     <div class="org">АО «Казахтелеком» · Чек-лист ДПБ 2026</div>
-    <h1>АКТ ИНСПЕКЦИИ</h1>
+    <h1>УКАЗАНИЕ ПО ПРОИЗВОДСТВЕННОЙ БЕЗОПАСНОСТИ</h1>
     <div style="font-size:13px;font-weight:600;color:#1c1c1e;margin-top:3px">${sec.title || ''}</div>
   </div>
   <div class="act-num">
+    <div style="font-size:15px;font-weight:800;color:#1A5FA8;background:#E8F1FB;padding:5px 12px;border-radius:8px;margin-bottom:6px">${actNumStr}</div>
     <div>Дата: <strong>${dateStr}</strong></div>
     <div style="margin-top:4px">Время: <strong>${new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</strong></div>
   </div>
 </div>
 
 <div class="meta-grid">
+  <div class="meta-row"><span class="meta-lbl">Номер указания:</span><span class="meta-val" style="color:#1A5FA8;font-weight:800">${actNumStr}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Дата проверки:</span><span class="meta-val">${dateStr}</span></div>
   <div class="meta-row"><span class="meta-lbl">Регион:</span><span class="meta-val">${region} регион</span></div>
   <div class="meta-row"><span class="meta-lbl">Область / город:</span><span class="meta-val">${oblast}</span></div>
   <div class="meta-row"><span class="meta-lbl">Населённый пункт:</span><span class="meta-val">${city}</span></div>
@@ -1318,13 +1588,13 @@ function generatePdf(){
 
 <div class="kpi-row">
   <div class="kpi tot"><div class="kpi-n">${items.length}</div><div class="kpi-l">Пунктов</div></div>
-  <div class="kpi vio"><div class="kpi-n">${viols.length}</div><div class="kpi-l">Нарушений</div></div>
+  <div class="kpi vio"><div class="kpi-n">${totalViolCount}</div><div class="kpi-l">Нарушений</div></div>
   <div class="kpi ok"><div class="kpi-n">${ok}</div><div class="kpi-l">Соответствий</div></div>
   <div class="kpi na"><div class="kpi-n">${na}</div><div class="kpi-l">Не применимо</div></div>
 </div>
 
-<h2>Выявленные нарушения</h2>
-${viols.length === 0
+<h2>Выявленные нарушения${customViols.length ? ' (включая иные несоответствия)' : ''}</h2>
+${totalViolCount === 0
   ? '<div class="no-viol">Нарушений не выявлено</div>'
   : `<table>
       <thead><tr>
@@ -1366,7 +1636,7 @@ ${viols.length === 0
 </div>
 
 <div style="text-align:center;margin-top:20px;font-size:10px;color:#9B9A97;border-top:1px solid #eee;padding-top:8px">
-  Сформировано системой SafetyInspect KZ · АО «Казахтелеком» · ДПБ 2026 · ${dateStr}
+  Указание по производственной безопасности ${actNumStr} · АО «Казахтелеком» · ДПБ 2026 · ${dateStr}
 </div>
 
 <script>window.onload=function(){window.print();}<\/script>
@@ -1379,16 +1649,218 @@ ${viols.length === 0
     // fallback: download as file
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Акт_инспекции_${(sec.title||'').replace(/\s+/g,'_')}_${dateStr.replace(/\./g,'-')}.html`;
+    a.download = `Указание_по_ПБ_${actNumStr}_${(sec.title||'').replace(/\s+/g,'_')}_${dateStr.replace(/\./g,'-')}.html`;
     a.click();
   }
   setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+
+// ═══════════════ PEOPLE MANAGEMENT ═══════════════
+const COLORS_BG  = ['#E8F1FB','#EEEDFE','#E1F5EE','#FEF3C7','#FAECE7','#E6F4E8'];
+const COLORS_FG  = ['#1A5FA8','#534AB7','#0F6E56','#B45309','#993C1D','#2D7A3A'];
+
+function getInitials(name){
+  return name.trim().split(/\s+/).slice(0,2).map(w=>w[0]?.toUpperCase()||'').join('');
+}
+
+function loadPeople(){
+  try {
+    const m = localStorage.getItem('si_managers');
+    const i = localStorage.getItem('si_inspectors');
+    const p = localStorage.getItem('si_profile');
+    return {
+      managers:   m ? JSON.parse(m) : [
+        {name:'Асанов Серик Болатович',    role:'Руководитель ДПБ-филиала',    org:'ДПБ-филиал · Астана', phone:'', email:''},
+        {name:'Нурланов Кайрат Сейткалиевич', role:'Зам. руководителя по ПБ',  org:'ДПБ-филиал · Астана', phone:'', email:''},
+        {name:'Джаксыбекова Молдир Ахметовна',role:'Начальник отдела ОТ',      org:'ДПБ-филиал · Астана', phone:'', email:''}
+      ],
+      inspectors: i ? JSON.parse(i) : [
+        {name:'Сейткали Айдос Маратович', role:'Инспектор по ОТ/ПБ', org:'ДПБ-филиал · Астана', phone:'', email:''}
+      ],
+      profile:    p ? JSON.parse(p) : {name:'Айдос Сейткали', role:'Инспектор по ОТ/ПБ', org:'ДПБ-филиал АО «Казахтелеком» · Астана', phone:'', email:''}
+    };
+  } catch(e){ return {managers:[], inspectors:[], profile:{name:'',role:'',org:'',phone:'',email:''}}; }
+}
+
+function savePeople(key, data){
+  try { localStorage.setItem('si_'+key, JSON.stringify(data)); } catch(e){}
+}
+
+function personCard(person, idx, type, colorIdx){
+  const bg = COLORS_BG[colorIdx % COLORS_BG.length];
+  const fg = COLORS_FG[colorIdx % COLORS_FG.length];
+  const initials = getInitials(person.name);
+  return `<div style="background:var(--white);border-radius:var(--r-lg);border:1px solid var(--gray200);margin-bottom:8px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--gray100)">
+      <div style="width:40px;height:40px;border-radius:50%;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;color:var(--gray800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${person.name}</div>
+        <div style="font-size:12px;color:var(--gray400);margin-top:1px">${person.role}</div>
+        ${person.org ? `<div style="font-size:11px;color:var(--gray400);margin-top:1px">${person.org}</div>` : ''}
+      </div>
+    </div>
+    ${person.phone||person.email ? `<div style="display:flex;gap:0">
+      ${person.phone ? `<a href="tel:${person.phone}" style="flex:1;padding:9px 12px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--blue);text-decoration:none;border-right:1px solid var(--gray100)">
+        <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"/></svg>
+        ${person.phone}</a>` : ''}
+      ${person.email ? `<a href="mailto:${person.email}" style="flex:1;padding:9px 12px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--blue);text-decoration:none">
+        <svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        ${person.email}</a>` : ''}
+    </div>` : ''}
+    <div style="display:flex;border-top:1px solid var(--gray100)">
+      <button onclick="editPerson('${type}',${idx})" style="flex:1;padding:10px;background:none;border:none;border-right:1px solid var(--gray100);cursor:pointer;font-size:13px;color:var(--blue);font-family:inherit;font-weight:600">✏️ Редактировать</button>
+      <button onclick="deletePerson('${type}',${idx})" style="flex:1;padding:10px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--red);font-family:inherit;font-weight:600">🗑 Удалить</button>
+    </div>
+  </div>`;
+}
+
+function renderProfileLists(){
+  const {managers, inspectors, profile} = loadPeople();
+  // Profile header
+  document.getElementById('prof-display-name').textContent = profile.name;
+  document.getElementById('prof-display-role').textContent = profile.role;
+  document.getElementById('prof-display-org').textContent  = profile.org;
+  document.getElementById('prof-ava-initials').textContent = getInitials(profile.name);
+  // Managers list
+  const mEl = document.getElementById('mgr-list-profile');
+  mEl.innerHTML = managers.length
+    ? managers.map((m,i)=>personCard(m,i,'mgr',i)).join('')
+    : '<div style="text-align:center;padding:16px;color:var(--gray400);font-size:13px">Нет ответственных руководителей</div>';
+  // Inspectors list
+  const iEl = document.getElementById('insp-list-profile');
+  iEl.innerHTML = inspectors.length
+    ? inspectors.map((p,i)=>personCard(p,i,'insp',i)).join('')
+    : '<div style="text-align:center;padding:16px;color:var(--gray400);font-size:13px">Нет инспекторов</div>';
+  // Update send screen manager list
+  renderSendMgrList(managers);
+}
+
+function renderSendMgrList(managers){
+  const container = document.getElementById('mgr-list-send');
+  if(!container) return;
+  container.innerHTML = managers.map((m,i)=>{
+    const bg = COLORS_BG[i % COLORS_BG.length];
+    const fg = COLORS_FG[i % COLORS_FG.length];
+    return `<div class="mgr-row" onclick="selMgr(this,'${getInitials(m.name)}','${m.name.replace(/'/g,"\\'")}','${m.role.replace(/'/g,"\\'")}')">
+      <div class="mgr-ava" style="background:${bg};color:${fg}">${getInitials(m.name)}</div>
+      <div><div class="mgr-name">${m.name}</div><div class="mgr-role">${m.role}</div></div>
+      <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+    </div>`;
+  }).join('');
+}
+
+function editPerson(type, idx){
+  const {managers, inspectors} = loadPeople();
+  if(type === 'mgr'){
+    const m = managers[idx];
+    document.getElementById('am-name').value  = m.name;
+    document.getElementById('am-role').value  = m.role;
+    document.getElementById('am-org').value   = m.org||'';
+    document.getElementById('am-phone').value = m.phone||'';
+    document.getElementById('am-email').value = m.email||'';
+    document.getElementById('am-edit-idx').value = idx;
+    document.getElementById('add-mgr-title').textContent = 'Редактировать руководителя';
+    showScreen('sc-add-mgr');
+  } else {
+    const p = inspectors[idx];
+    document.getElementById('ai-name').value  = p.name;
+    document.getElementById('ai-role').value  = p.role;
+    document.getElementById('ai-org').value   = p.org||'';
+    document.getElementById('ai-phone').value = p.phone||'';
+    document.getElementById('ai-email').value = p.email||'';
+    document.getElementById('ai-edit-idx').value = idx;
+    document.getElementById('add-insp-title').textContent = 'Редактировать инспектора';
+    showScreen('sc-add-insp');
+  }
+}
+
+function deletePerson(type, idx){
+  if(!confirm('Удалить запись?')) return;
+  const {managers, inspectors} = loadPeople();
+  if(type === 'mgr'){ managers.splice(idx,1); savePeople('managers', managers); }
+  else               { inspectors.splice(idx,1); savePeople('inspectors', inspectors); }
+  renderProfileLists();
+}
+
+function saveMgr(){
+  const name  = document.getElementById('am-name').value.trim();
+  const role  = document.getElementById('am-role').value.trim();
+  const org   = document.getElementById('am-org').value.trim();
+  const phone = document.getElementById('am-phone').value.trim();
+  const email = document.getElementById('am-email').value.trim();
+  const err   = document.getElementById('err-am');
+  if(!name||!role){ err.classList.add('show'); return; }
+  err.classList.remove('show');
+  const {managers} = loadPeople();
+  const idx = parseInt(document.getElementById('am-edit-idx').value);
+  const obj = {name, role, org, phone, email};
+  if(idx >= 0) managers[idx] = obj;
+  else managers.push(obj);
+  savePeople('managers', managers);
+  // reset form
+  ['am-name','am-role','am-org','am-phone','am-email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('am-edit-idx').value = '-1';
+  document.getElementById('add-mgr-title').textContent = 'Добавить руководителя';
+  renderProfileLists();
+  showScreen('sc-profile');
+}
+
+function saveInsp(){
+  const name  = document.getElementById('ai-name').value.trim();
+  const role  = document.getElementById('ai-role').value.trim();
+  const org   = document.getElementById('ai-org').value.trim();
+  const phone = document.getElementById('ai-phone').value.trim();
+  const email = document.getElementById('ai-email').value.trim();
+  const err   = document.getElementById('err-ai');
+  if(!name||!role){ err.classList.add('show'); return; }
+  err.classList.remove('show');
+  const {inspectors} = loadPeople();
+  const idx = parseInt(document.getElementById('ai-edit-idx').value);
+  const obj = {name, role, org, phone, email};
+  if(idx >= 0) inspectors[idx] = obj;
+  else inspectors.push(obj);
+  savePeople('inspectors', inspectors);
+  ['ai-name','ai-role','ai-org','ai-phone','ai-email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ai-edit-idx').value = '-1';
+  document.getElementById('add-insp-title').textContent = 'Добавить инспектора';
+  renderProfileLists();
+  // also update inspector field in form
+  if(inspectors.length){ document.getElementById('f-inspector').value = inspectors[0].name; document.getElementById('f-position').value = inspectors[0].role; }
+  showScreen('sc-profile');
+}
+
+function saveProfile(){
+  const name  = document.getElementById('ep-name').value.trim();
+  const role  = document.getElementById('ep-role').value.trim();
+  const org   = document.getElementById('ep-org').value.trim();
+  const phone = document.getElementById('ep-phone').value.trim();
+  const email = document.getElementById('ep-email').value.trim();
+  if(!name) return;
+  savePeople('profile', {name, role, org, phone, email});
+  // update inspector field in checklist form
+  document.getElementById('f-inspector').value = name;
+  document.getElementById('f-position').value  = role;
+  renderProfileLists();
+  showScreen('sc-profile');
+}
+
+function openEditProfile(){
+  const {profile} = loadPeople();
+  document.getElementById('ep-name').value  = profile.name;
+  document.getElementById('ep-role').value  = profile.role;
+  document.getElementById('ep-org').value   = profile.org;
+  document.getElementById('ep-phone').value = profile.phone||'';
+  document.getElementById('ep-email').value = profile.email||'';
+  showScreen('sc-edit-profile');
 }
 
 // ═══════════════ INIT ═══════════════
 buildHomeCards();
 buildSectionCards();
 switchPeriod('month');
+renderProfileLists();
+// pre-fill inspector from saved profile
+(function(){ const {profile, inspectors} = loadPeople(); if(inspectors.length){ document.getElementById('f-inspector').value = inspectors[0].name; document.getElementById('f-position').value = inspectors[0].role; } else if(profile.name){ document.getElementById('f-inspector').value = profile.name; document.getElementById('f-position').value = profile.role; } })();
 </script>
 </body>
 </html>
