@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/28791765/README.md)
 # SafetyInspect KZ — v1.2 ФИНАЛЬНАЯ ВЕРСИЯ
 ## АО «Казахтелеком» · Департамент производственной безопасности · 2026
 
