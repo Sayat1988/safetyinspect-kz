@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1A5FA8">
+<title>SafetyInspect KZ</title>
+<style>
+:root{
+  --blue:#1A5FA8;--blue-dk:#0D3D6E;--blue-lt:#E8F1FB;
+  --green:#2D7A3A;--green-lt:#E6F4E8;
+  --red:#C0392B;--red-lt:#FDECEA;
+  --amber:#B45309;--amber-lt:#FEF3C7;
+  --purple:#534AB7;--purple-lt:#EEEDFE;
+  --teal:#0F6E56;--teal-lt:#E1F5EE;
+  --gray50:#F8F8F7;--gray100:#EFEFED;--gray200:#DDDCDA;
+  --gray400:#9B9A97;--gray600:#6B6A67;--gray800:#2C2C2A;
+  --white:#FFFFFF;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-xl:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1A5FA8;color:var(--gray800);font-size:15px}
+#app{max-width:430px;min-height:100dvh;margin:0 auto;background:var(--gray50);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.screen.active{display:flex}
+.scrollable{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* TOP BAR */
+.topbar{background:var(--white);border-bottom:1px solid var(--gray100);height:52px;display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:5}
+.topbar-title{font-size:16px;font-weight:700;color:var(--gray800);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-icon{background:none;border:none;cursor:pointer;color:var(--gray600);padding:6px;border-radius:var(--r-sm);line-height:1;display:flex;align-items:center;justify-content:center}
+.btn-icon:active{background:var(--gray100)}
+.btn-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* BOTTOM NAV */
+.bottomnav{background:var(--white);border-top:1px solid var(--gray100);display:flex;padding-bottom:env(safe-area-inset-bottom);flex-shrink:0}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;background:none;border:none;cursor:pointer;font-size:10px;font-weight:600;letter-spacing:.01em;color:var(--gray400);font-family:inherit;transition:color .12s}
+.ntab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ntab.on{color:var(--blue)}
+
+/* CARDS */
+.card{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--gray200);overflow:hidden}
+.card-list{padding:0 12px;display:flex;flex-direction:column;gap:8px}
+.sec-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray400);padding:14px 14px 7px}
+
+/* FORM */
+.fcard{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--gray200);overflow:hidden;margin:0 12px 10px}
+.field{padding:11px 14px;border-bottom:1px solid var(--gray100);display:flex;flex-direction:column;gap:5px}
+.field:last-child{border-bottom:none}
+.field.req .flbl::after{content:' *';color:var(--red)}
+.flbl{font-size:11px;font-weight:700;color:var(--gray400);text-transform:uppercase;letter-spacing:.04em}
+.finp{border:none;outline:none;font-size:15px;color:var(--gray800);background:transparent;width:100%;font-family:inherit;padding:0}
+.finp::placeholder{color:var(--gray200)}
+.fsel{border:none;outline:none;font-size:15px;color:var(--gray800);background:transparent;width:100%;font-family:inherit;padding:0;-webkit-appearance:none;cursor:pointer}
+.fsel.ph{color:var(--gray200)}
+.fsel:disabled{color:var(--gray200);cursor:not-allowed}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:15px;background:var(--blue);color:var(--white);border:none;border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s}
+.btn-primary:active{background:var(--blue-dk)}
+.btn-primary:disabled{background:var(--gray200);color:var(--gray400);cursor:not-allowed}
+.btn-secondary{width:100%;padding:14px;background:var(--white);color:var(--blue);border:2px solid var(--blue);border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-ghost{width:100%;padding:12px;background:none;border:none;color:var(--gray600);font-size:14px;cursor:pointer;font-family:inherit}
+.btn-primary svg,.btn-secondary svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn-wrap{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+
+/* BADGES */
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0}
+.b-open{background:var(--red-lt);color:var(--red)}
+.b-work{background:var(--amber-lt);color:var(--amber)}
+.b-done{background:var(--green-lt);color:var(--green)}
+.b-over{background:#FEE2E2;color:#991B1B}
+
+/* HERO STRIP */
+.hero{background:var(--blue);padding:18px 14px 16px;color:var(--white)}
+.hero-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:4px}
+.hero-title{font-size:20px;font-weight:800;margin-bottom:14px}
+.kpi3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.kpi-cell{background:rgba(255,255,255,.15);border-radius:var(--r-md);padding:10px 6px;text-align:center}
+.kpi-n{font-size:22px;font-weight:800;line-height:1}
+.kpi-l{font-size:10px;opacity:.75;margin-top:3px}
+
+/* CHECKLIST */
+.cl-progress{background:var(--white);border-bottom:1px solid var(--gray100);padding:10px 14px;flex-shrink:0}
+.cl-prog-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.cl-prog-lbl{font-size:12px;color:var(--gray600)}
+.cl-prog-pct{font-size:12px;font-weight:700;color:var(--blue)}
+.prog-track{height:5px;background:var(--gray100);border-radius:3px}
+.prog-fill{height:5px;background:var(--blue);border-radius:3px;transition:width .3s}
+
+.items-list{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.icard{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r-md);padding:13px}
+.icard.yes{border-color:#86EFAC}
+.icard.no{border-color:#FCA5A5}
+.icard.na{border-color:var(--gray200)}
+.inum{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray400);margin-bottom:5px}
+.itext{font-size:14px;color:var(--gray800);line-height:1.5;margin-bottom:5px}
+.inka{font-size:11px;color:var(--blue);margin-bottom:11px;line-height:1.4}
+.ans-row{display:flex;gap:6px}
+.ans-btn{flex:1;padding:9px 4px;border:1px solid var(--gray200);border-radius:var(--r-sm);background:var(--white);font-size:13px;font-weight:600;cursor:pointer;color:var(--gray600);font-family:inherit;transition:all .1s}
+.ans-btn.yes.s{background:var(--green-lt);border-color:var(--green);color:var(--green)}
+.ans-btn.no.s{background:var(--red-lt);border-color:var(--red);color:var(--red)}
+.ans-btn.na.s{background:var(--gray100);border-color:var(--gray400);color:var(--gray600)}
+.vbox{margin-top:9px;background:var(--gray50);border-radius:var(--r-sm);padding:10px;border:1px solid var(--gray200)}
+.vlbl{font-size:11px;font-weight:700;color:var(--red);margin-bottom:6px}
+.vtxt{width:100%;border:1px solid var(--gray200);border-radius:var(--r-sm);padding:8px 10px;font-size:13px;background:var(--white);color:var(--gray800);font-family:inherit;resize:none;outline:none}
+.vtxt:focus{border-color:var(--blue)}
+.photo-btn{display:flex;align-items:center;gap:7px;margin-top:7px;padding:8px 10px;border:1.5px dashed var(--gray200);border-radius:var(--r-sm);background:none;cursor:pointer;font-size:12px;color:var(--gray600);width:100%;font-family:inherit}
+.photo-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
+
+/* ACT SCREEN */
+.act-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:12px}
+.akpi{border-radius:var(--r-md);padding:10px 12px}
+.akpi-n{font-size:22px;font-weight:800}
+.akpi-l{font-size:10px;margin-top:2px}
+.akpi.tot{background:var(--blue-lt)}.akpi.tot .akpi-n,.akpi.tot .akpi-l{color:var(--blue)}
+.akpi.vio{background:var(--red-lt)}.akpi.vio .akpi-n,.akpi.vio .akpi-l{color:var(--red)}
+.akpi.ok{background:var(--green-lt)}.akpi.ok .akpi-n,.akpi.ok .akpi-l{color:var(--green)}
+.akpi.na{background:var(--gray100)}.akpi.na .akpi-n,.akpi.na .akpi-l{color:var(--gray600)}
+.vio-item{background:var(--gray50);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;border:1px solid var(--gray200)}
+.vio-n{font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.04em}
+.vio-t{font-size:13px;color:var(--gray800);margin-top:3px;line-height:1.4}
+.vio-npa{font-size:11px;color:var(--blue);margin-top:3px}
+.vio-comm{font-size:11px;color:var(--gray600);margin-top:3px;font-style:italic}
+.dl-row{display:flex;align-items:center;gap:8px;margin-top:7px}
+.dl-lbl{font-size:11px;color:var(--gray600)}
+.dl-inp{font-size:12px;border:1px solid var(--gray200);border-radius:var(--r-sm);padding:4px 8px;background:var(--white);color:var(--gray800);font-family:inherit}
+
+/* SEND SCREEN */
+.mgr-row{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--gray100);cursor:pointer}
+.mgr-row:last-child{border-bottom:none}
+.mgr-row:active{background:var(--gray50)}
+.mgr-ava{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.mgr-name{font-size:14px;font-weight:600;color:var(--gray800)}
+.mgr-role{font-size:11px;color:var(--gray400);margin-top:1px}
+.mgr-check{margin-left:auto}
+.mgr-check svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--gray200)}
+.mgr-check svg.sel{color:var(--blue)}
+
+/* TIMELINE */
+.tl{padding:12px 14px;display:flex;flex-direction:column}
+.tl-item{display:flex;gap:10px}
+.tl-spine{display:flex;flex-direction:column;align-items:center;width:22px;flex-shrink:0}
+.tl-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tl-dot svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.tl-dot.done{background:var(--green-lt);color:var(--green)}
+.tl-dot.active{background:var(--blue);color:var(--white)}
+.tl-dot.wait{background:var(--gray100);border:1.5px solid var(--gray200);color:var(--gray400)}
+.tl-line{width:1.5px;flex:1;min-height:12px;background:var(--gray200);margin:3px 0}
+.tl-body{flex:1;padding-bottom:14px}
+.tl-title{font-size:13px;font-weight:700;color:var(--gray800)}
+.tl-sub{font-size:11px;color:var(--gray400);margin-top:2px;line-height:1.4}
+.tl-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px}
+
+/* SENT SCREEN */
+.sent-hero{background:var(--green-lt);border-bottom:1px solid #86EFAC;padding:24px 16px;text-align:center}
+.sent-ico{width:60px;height:60px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.sent-ico svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.sent-title{font-size:17px;font-weight:800;color:#1A4D22}
+.sent-sub{font-size:13px;color:var(--green);margin-top:5px;line-height:1.5}
+
+/* VIOLATIONS LIST */
+.vrow{display:flex;align-items:flex-start;gap:9px;padding:10px 0;border-bottom:1px solid var(--gray100)}
+.vrow:last-child{border-bottom:none}
+.vdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.vdot.open{background:var(--red)}.vdot.work{background:#D97706}.vdot.done{background:var(--green)}.vdot.over{background:#7F1D1D}
+.vtext{font-size:13px;color:var(--gray800);line-height:1.4;flex:1}
+.vmeta{font-size:11px;color:var(--gray400);margin-top:3px}
+
+/* FROW (detail rows) */
+.frow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--gray100)}
+.frow:last-child{border-bottom:none}
+.frow-ico{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.frow-ico svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.frow-lbl{font-size:11px;color:var(--gray400);margin-bottom:1px}
+.frow-val{font-size:13px;font-weight:600;color:var(--gray800)}
+
+/* DASHBOARD */
+.dash-hero{background:var(--blue);padding:18px 14px}
+.dash-kpi{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+.dkpi{background:rgba(255,255,255,.15);border-radius:var(--r-md);padding:11px 10px}
+.dkpi-n{font-size:24px;font-weight:800;color:var(--white)}
+.dkpi-l{font-size:10px;color:rgba(255,255,255,.75);margin-top:2px}
+.seg{display:flex;background:var(--gray100);border-radius:8px;padding:2px;margin:12px 12px 0}
+.seg-btn{flex:1;padding:7px 4px;border:none;border-radius:6px;background:none;font-size:11px;font-weight:700;color:var(--gray400);cursor:pointer;font-family:inherit;transition:all .15s}
+.seg-btn.on{background:var(--white);color:var(--blue)}
+.bar-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid rgba(0,0,0,.04)}
+.bar-row:last-child{border-bottom:none}
+.bar-lbl{font-size:11px;color:var(--gray600);width:88px;flex-shrink:0;text-align:right;line-height:1.3}
+.bar-track{flex:1;height:17px;background:var(--gray100);border-radius:4px;overflow:hidden}
+.bar-fill{height:17px;border-radius:4px;transition:width .5s}
+.bar-val{font-size:11px;color:var(--gray600);width:22px;flex-shrink:0;text-align:right}
+.donut-wrap{padding:14px;display:flex;align-items:center;gap:14px}
+.leg-row{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-lbl{font-size:11px;color:var(--gray600);flex:1}
+.leg-val{font-size:12px;font-weight:700;color:var(--gray800)}
+.top-row{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;border-bottom:1px solid var(--gray100)}
+.top-row:last-child{border-bottom:none}
+.top-num{width:22px;height:22px;border-radius:6px;background:var(--gray100);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gray600);flex-shrink:0;margin-top:1px}
+.top-text{font-size:12px;color:var(--gray800);line-height:1.45;flex:1}
+.top-npa{font-size:10px;color:var(--blue);margin-top:2px}
+.top-cnt{font-size:13px;font-weight:800;color:var(--red);flex-shrink:0}
+.reg-row{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--gray100)}
+.reg-row:last-child{border-bottom:none}
+.reg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.reg-name{font-size:12px;color:var(--gray800);flex:1}
+.reg-bar{flex:0 0 70px;height:6px;background:var(--gray100);border-radius:3px;overflow:hidden}
+.reg-fill{height:6px;border-radius:3px}
+.reg-val{font-size:11px;color:var(--gray600);width:22px;text-align:right}
+.idx-wrap{padding:14px 14px 10px;display:flex;flex-direction:column;align-items:center}
+.idx-n{font-size:36px;font-weight:800;color:var(--blue);margin-top:6px}
+.idx-bar{width:100%;height:8px;background:var(--gray100);border-radius:4px;overflow:hidden;margin-top:10px}
+.idx-fill{height:8px;border-radius:4px;background:var(--blue);transition:width .6s}
+.idx-foot{display:flex;justify-content:space-between;font-size:10px;color:var(--gray400);margin-top:5px}
+.trend-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.trend-m{font-size:11px;color:var(--gray600);width:32px;text-align:right;flex-shrink:0}
+.trend-bar{height:20px;background:var(--red);border-radius:4px;min-width:4px;transition:width .5s}
+.trend-n{font-size:11px;color:var(--gray600);margin-left:4px}
+
+/* HISTORY */
+.hist-card{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r-lg);padding:13px;margin-bottom:8px;cursor:pointer}
+.hist-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.hist-icon{width:36px;height:36px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hist-title{font-size:14px;font-weight:700;color:var(--gray800)}
+.hist-sub{font-size:11px;color:var(--gray400);margin-top:2px}
+.hist-prog{height:4px;background:var(--gray100);border-radius:2px;overflow:hidden}
+.hist-fill{height:4px;border-radius:2px}
+
+/* PROFILE */
+.prof-ava{width:54px;height:54px;border-radius:50%;background:var(--blue-lt);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--blue);flex-shrink:0}
+.prof-row{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--gray100)}
+.prof-row:last-child{border-bottom:none}
+.prof-ico{width:32px;height:32px;border-radius:var(--r-sm);background:var(--gray50);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prof-ico svg{width:16px;height:16px;stroke:var(--gray600);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.prof-lbl{flex:1;font-size:14px;color:var(--gray800)}
+.prof-val{font-size:12px;color:var(--gray400)}
+.prof-val.on{color:var(--green);font-weight:700}
+
+/* LOGIN */
+.login-bg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--white)}
+.login-logo{width:72px;height:72px;background:var(--blue);border-radius:22px;display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.login-logo svg{width:40px;height:40px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.login-title{font-size:24px;font-weight:800;color:var(--gray800);margin-bottom:4px}
+.login-sub{font-size:14px;color:var(--gray400);margin-bottom:32px;text-align:center;line-height:1.5}
+.login-form{width:100%;display:flex;flex-direction:column;gap:12px}
+.input-wrap{display:flex;flex-direction:column;gap:5px}
+.input-lbl{font-size:12px;font-weight:700;color:var(--gray600);text-transform:uppercase;letter-spacing:.04em}
+.text-inp{border:1px solid var(--gray200);border-radius:var(--r-md);padding:13px 14px;font-size:15px;color:var(--gray800);background:var(--white);font-family:inherit;outline:none;transition:border-color .15s}
+.text-inp:focus{border-color:var(--blue)}
+.login-hint{font-size:12px;color:var(--gray400);text-align:center;margin-top:4px}
+
+/* UTILS */
+.err-msg{font-size:11px;color:var(--red);padding:0 12px 10px;display:none}
+.err-msg.show{display:block}
+.notice{background:var(--blue-lt);border-radius:var(--r-md);padding:10px 12px;font-size:12px;color:var(--blue);margin:0 12px 10px;line-height:1.5}
+.notif-card{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r-md);padding:12px;margin:0 12px 8px;display:flex;gap:10px;align-items:flex-start}
+.notif-ico{width:36px;height:36px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-ico svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.notif-title{font-size:13px;font-weight:700;color:var(--gray800)}
+.notif-sub{font-size:11px;color:var(--gray400);margin-top:2px;line-height:1.4}
+.notif-time{font-size:10px;color:var(--gray400);margin-top:4px}
+.ok-check{margin-left:auto;color:var(--green)}
+.ok-check svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 1 — ЛОГИН
+═══════════════════════════════════════ -->
+<div class="screen active" id="sc-login">
+  <div class="login-bg">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11 4.5-.85 8-5.75 8-11V6L12 2z"/></svg>
+    </div>
+    <div class="login-title">SafetyInspect KZ</div>
+    <div class="login-sub">Производственная безопасность<br>АО «Казахтелеком» · ДПБ 2026</div>
+    <div class="login-form">
+      <div class="input-wrap">
+        <div class="input-lbl">Логин</div>
+        <input class="text-inp" id="l-user" type="text" placeholder="email@kt.kz" value="inspector@kt.kz">
+      </div>
+      <div class="input-wrap">
+        <div class="input-lbl">Пароль</div>
+        <input class="text-inp" id="l-pass" type="password" placeholder="••••••••" value="demo1234">
+      </div>
+      <button class="btn-primary" style="margin-top:4px" onclick="doLogin()">
+        <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        Войти
+      </button>
+      <div class="login-hint">Демо-доступ: любые данные</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 2 — ГЛАВНАЯ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-home">
+  <div class="hero">
+    <div class="hero-label">АО «Казахтелеком» · ДПБ-филиал · Астана</div>
+    <div class="hero-title">Инспекции 2026</div>
+    <div class="kpi3">
+      <div class="kpi-cell"><div class="kpi-n" id="kh-insp">3</div><div class="kpi-l">Инспекций</div></div>
+      <div class="kpi-cell"><div class="kpi-n" id="kh-viol">12</div><div class="kpi-l">Нарушений</div></div>
+      <div class="kpi-cell"><div class="kpi-n" id="kh-open">5</div><div class="kpi-l">Открытых</div></div>
+    </div>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr">Начать проверку</div>
+    <div class="card-list" id="home-sections"></div>
+    <div class="sec-hdr">Открытые нарушения</div>
+    <div style="padding:0 12px 14px">
+      <div class="vrow"><div class="vdot open"></div><div class="vtext">Огнетушители в зоне АГП не прошли перезарядку<div class="vmeta">Транспорт · Приказ МВД № 534, п. 38 · До 20.06.2026</div></div><span class="badge b-open">Открыто</span></div>
+      <div class="vrow"><div class="vdot work"></div><div class="vtext">Диэлектрический коврик отсутствует перед стойкой №3<div class="vmeta">Техн. пом. · Распоряжение № 253, п. 55 · До 15.06.2026</div></div><span class="badge b-work">В работе</span></div>
+      <div class="vrow"><div class="vdot done"></div><div class="vtext">Журнал инструктажей по ПБ не заполнен за апрель<div class="vmeta">Документация · Приказ МЧС № 276, п. 9 · Закрыто</div></div><span class="badge b-done">Закрыто</span></div>
+    </div>
+  </div>
+  <div class="bottomnav" id="bnav-home">
+    <button class="ntab on" onclick="mainTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная</button>
+    <button class="ntab" onclick="mainTab('dash')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Дашборд</button>
+    <button class="ntab" onclick="mainTab('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>История</button>
+    <button class="ntab" onclick="mainTab('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 3 — НОВАЯ ИНСПЕКЦИЯ (ФОРМА)
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-newform">
+  <div class="topbar">
+    <button class="btn-icon" onclick="goHome()" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title">Новая инспекция</div>
+    <span style="font-size:11px;color:var(--gray400)">ДПБ 2026</span>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr" style="padding-top:10px">Место проведения</div>
+    <div class="fcard">
+      <div class="field req"><div class="flbl">Регион</div>
+        <select class="fsel ph" id="f-region" onchange="onRegion()">
+          <option value="">Выберите регион...</option>
+          <option value="Алматинский">Алматинский регион</option>
+          <option value="Восточный">Восточный регион</option>
+          <option value="Западный">Западный регион</option>
+          <option value="Северный">Северный регион</option>
+          <option value="Центральный">Центральный регион</option>
+          <option value="Южный">Южный регион</option>
+        </select>
+      </div>
+      <div class="field req"><div class="flbl">Область / город</div>
+        <select class="fsel ph" id="f-oblast" onchange="onOblast()" disabled><option value="">Сначала выберите регион...</option></select>
+      </div>
+      <div class="field req"><div class="flbl">Населённый пункт</div><input class="finp" id="f-city" placeholder="Город, посёлок, село..." type="text"></div>
+      <div class="field req"><div class="flbl">Адрес объекта</div><input class="finp" id="f-address" placeholder="Улица, дом, корпус..." type="text"></div>
+    </div>
+
+    <div class="sec-hdr">Организация</div>
+    <div class="fcard">
+      <div class="field req"><div class="flbl">Филиал АО «Казахтелеком»</div>
+        <select class="fsel ph" id="f-filial" onchange="onFilial()" disabled><option value="">Сначала выберите область...</option></select>
+      </div>
+      <div class="field req"><div class="flbl">Структурное подразделение</div>
+        <select class="fsel ph" id="f-dept" disabled><option value="">Сначала выберите филиал...</option></select>
+      </div>
+      <div class="field"><div class="flbl">Наименование объекта</div><input class="finp" id="f-object" placeholder="АТС, узел связи, гараж..." type="text"></div>
+    </div>
+
+    <div class="sec-hdr">Инспектор</div>
+    <div class="fcard">
+      <div class="field req"><div class="flbl">Ф.И.О. проверяющего</div><input class="finp" id="f-inspector" value="Сейткали Айдос Маратович" type="text"></div>
+      <div class="field req"><div class="flbl">Должность</div><input class="finp" id="f-position" value="Инспектор по ОТ/ПБ" type="text"></div>
+      <div class="field req"><div class="flbl">Дата проверки</div><input class="finp" id="f-date" type="date" value="2026-06-10"></div>
+    </div>
+
+    <div class="sec-hdr">Ответственные на объекте</div>
+    <div class="fcard">
+      <div class="field"><div class="flbl">Ответственный по объекту</div><input class="finp" id="f-resp" placeholder="Ф.И.О. ответственного" type="text"></div>
+      <div class="field"><div class="flbl">Контактный телефон</div><input class="finp" id="f-phone" placeholder="+7 (___) ___-__-__" type="tel"></div>
+    </div>
+
+    <div class="err-msg" id="err-form">Заполните все обязательные поля (*)</div>
+    <div class="btn-wrap"><button class="btn-primary" onclick="goChooseSection()">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Выбрать раздел
+    </button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 4 — ВЫБОР РАЗДЕЛА
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-sections">
+  <div class="topbar">
+    <button class="btn-icon" onclick="showScreen('sc-newform')" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title">Выбор раздела</div>
+  </div>
+  <div style="background:var(--blue-lt);padding:10px 14px;border-bottom:1px solid var(--gray100)">
+    <div style="font-size:12px;color:var(--blue);font-weight:600" id="sec-obj-label">Объект: —</div>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr" style="padding-top:12px">Разделы чек-листа ДПБ 2026</div>
+    <div class="card-list" id="section-cards" style="padding-bottom:14px"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 5 — ЧЕК-ЛИСТ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-checklist">
+  <div class="topbar">
+    <button class="btn-icon" onclick="showScreen('sc-sections')" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title" id="cl-title">Чек-лист</div>
+    <span style="font-size:11px;background:var(--blue-lt);color:var(--blue);padding:3px 8px;border-radius:20px;font-weight:700;white-space:nowrap">
+      <svg style="width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-1px;margin-right:2px" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M12 20h.01"/></svg>
+      Офлайн
+    </span>
+  </div>
+  <div class="cl-progress">
+    <div class="cl-prog-row">
+      <span class="cl-prog-lbl" id="cl-prog-lbl">0 из 0</span>
+      <span class="cl-prog-pct" id="cl-prog-pct">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="cl-prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="scrollable">
+    <div class="items-list" id="cl-items"></div>
+  </div>
+  <div style="padding:10px 12px 12px;flex-shrink:0">
+    <button class="btn-primary" id="fin-btn" onclick="finishChecklist()" disabled>
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Завершить и сформировать акт
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 6 — АКТ СФОРМИРОВАН
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-act">
+  <div class="topbar">
+    <button class="btn-icon" onclick="goHome()" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title">Акт сформирован</div>
+  </div>
+  <div class="scrollable">
+    <div style="background:var(--green-lt);border-bottom:1px solid #86EFAC;padding:14px;display:flex;align-items:center;gap:12px">
+      <div style="width:46px;height:46px;background:var(--green);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg style="width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#1A4D22" id="act-title-label">Акт инспекции</div>
+        <div style="font-size:12px;color:var(--green);margin-top:2px" id="act-date-label"></div>
+      </div>
+    </div>
+    <div class="act-summary">
+      <div class="akpi tot"><div class="akpi-n" id="a-tot">0</div><div class="akpi-l">Пунктов</div></div>
+      <div class="akpi vio"><div class="akpi-n" id="a-vio">0</div><div class="akpi-l">Нарушений</div></div>
+      <div class="akpi ok"><div class="akpi-n" id="a-ok">0</div><div class="akpi-l">Соответствий</div></div>
+      <div class="akpi na"><div class="akpi-n" id="a-na">0</div><div class="akpi-l">Не применимо</div></div>
+    </div>
+    <div class="sec-hdr">Нарушения с предписанием</div>
+    <div style="padding:0 12px 4px" id="act-viols"></div>
+    <div class="btn-wrap">
+      <button class="btn-primary" onclick="showScreen('sc-send')">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Направить на исполнение
+      </button>
+      <button class="btn-secondary" onclick="generatePdf()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Скачать PDF-акт
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 7 — НАПРАВИТЬ НА ИСПОЛНЕНИЕ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-send">
+  <div class="topbar">
+    <button class="btn-icon" onclick="showScreen('sc-act')" aria-label="Назад"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="topbar-title">На исполнение</div>
+  </div>
+  <div class="scrollable">
+    <div class="sec-hdr" style="padding-top:12px">Ответственный руководитель</div>
+    <div class="fcard">
+      <div class="mgr-row" onclick="selMgr(this,'АС','Асанов Серик Болатович','Руководитель ДПБ-филиала')" id="mgr-0">
+        <div class="mgr-ava" style="background:var(--blue-lt);color:var(--blue)">АС</div>
+        <div><div class="mgr-name">Асанов Серик Болатович</div><div class="mgr-role">Руководитель ДПБ-филиала</div></div>
+        <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      </div>
+      <div class="mgr-row" onclick="selMgr(this,'НК','Нурланов Кайрат Сейткалиевич','Зам. руководителя по ПБ')" id="mgr-1">
+        <div class="mgr-ava" style="background:var(--purple-lt);color:var(--purple)">НК</div>
+        <div><div class="mgr-name">Нурланов Кайрат Сейткалиевич</div><div class="mgr-role">Зам. руководителя по ПБ</div></div>
+        <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      </div>
+      <div class="mgr-row" onclick="selMgr(this,'ДМ','Джаксыбекова Молдир Ахметовна','Начальник отдела ОТ')" id="mgr-2">
+        <div class="mgr-ava" style="background:var(--teal-lt);color:var(--teal)">ДМ</div>
+        <div><div class="mgr-name">Джаксыбекова Молдир Ахметовна</div><div class="mgr-role">Начальник отдела ОТ</div></div>
+        <div class="mgr-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      </div>
+    </div>
+
+    <div class="sec-hdr">Канал уведомления</div>
+    <div class="fcard">
+      <div class="field"><div class="flbl">Способ отправки</div>
+        <select class="fsel" id="notif-ch">
+          <option>Push-уведомление + Email</option>
+          <option>Только Push-уведомление</option>
+          <option>Только Email</option>
+        </select>
+      </div>
+      <div class="field"><div class="flbl">Комментарий к предписанию</div>
+        <input class="finp" id="send-comment" placeholder="Дополнительные указания..." type="text">
+      </div>
+    </div>
+
+    <div class="sec-hdr">Маршрут согласования</div>
+    <div class="fcard">
+      <div class="tl">
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Инспектор заполнил акт</div><div class="tl-sub">Сейткали А.М. · 10.06.2026</div><span class="tl-badge" style="background:var(--green-lt);color:var(--green)">Выполнено</span></div></div>
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot active"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Направление на исполнение</div><div class="tl-sub">Ожидает отправки руководителю</div><span class="tl-badge" style="background:var(--blue-lt);color:var(--blue)">Текущий шаг</span></div></div>
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Принятие руководителем</div><div class="tl-sub">Назначение исполнителей</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-title">Устранение нарушений</div><div class="tl-sub">Исполнители загружают фото-подтверждения</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
+        <div class="tl-item"><div class="tl-spine"><div class="tl-dot wait"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div><div class="tl-body" style="padding-bottom:4px"><div class="tl-title">Закрытие акта инспектором</div><div class="tl-sub">Подтверждение устранения нарушений</div><span class="tl-badge" style="background:var(--gray100);color:var(--gray600)">Ожидание</span></div></div>
+      </div>
+    </div>
+
+    <div class="err-msg" id="err-mgr">Выберите ответственного руководителя</div>
+    <div class="btn-wrap">
+      <button class="btn-primary" onclick="confirmSend()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Отправить предписание
+      </button>
+      <button class="btn-ghost" onclick="showScreen('sc-act')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 8 — УСПЕШНАЯ ОТПРАВКА
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-sent">
+  <div class="topbar"><div class="topbar-title">Предписание отправлено</div></div>
+  <div class="scrollable">
+    <div class="sent-hero">
+      <div class="sent-ico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <div class="sent-title">Акт направлен на исполнение</div>
+      <div class="sent-sub" id="sent-sub">Руководитель получил уведомление</div>
+    </div>
+    <div class="sec-hdr">Уведомления отправлены</div>
+    <div class="notif-card">
+      <div class="notif-ico" style="background:var(--blue-lt);color:var(--blue)"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+      <div style="flex:1"><div class="notif-title">Push-уведомление</div><div class="notif-sub" id="notif-p">Отправлено на телефон руководителя</div><div class="notif-time">Только что · Доставлено</div></div>
+      <div class="ok-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+    <div class="notif-card">
+      <div class="notif-ico" style="background:var(--green-lt);color:var(--green)"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+      <div style="flex:1"><div class="notif-title">Email с PDF-актом</div><div class="notif-sub" id="notif-e">Акт и предписание во вложении</div><div class="notif-time">Только что · Отправлено</div></div>
+      <div class="ok-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+    <div class="sec-hdr">Мероприятия по устранению</div>
+    <div style="padding:0 12px 4px" id="sent-viols"></div>
+    <div class="sec-hdr">Ответственный руководитель</div>
+    <div class="fcard">
+      <div class="frow">
+        <div class="frow-ico" style="background:var(--blue-lt);color:var(--blue)">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div style="flex:1"><div class="frow-lbl">Руководитель</div><div class="frow-val" id="sent-mgr-name">—</div></div>
+      </div>
+      <div class="frow">
+        <div class="frow-ico" style="background:var(--amber-lt);color:var(--amber)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div style="flex:1"><div class="frow-lbl">Статус</div><div class="frow-val">Уведомлён, ожидает принятия</div></div>
+      </div>
+      <div class="frow">
+        <div class="frow-ico" style="background:var(--red-lt);color:var(--red)">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div style="flex:1"><div class="frow-lbl">Ближайший срок устранения</div><div class="frow-val" style="color:var(--red)" id="sent-deadline">—</div></div>
+      </div>
+    </div>
+    <div class="btn-wrap">
+      <button class="btn-primary" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        На главную
+      </button>
+      <button class="btn-secondary" onclick="mainTab('dash'); goHome();">
+        <svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
+        Открыть дашборд
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 9 — ДАШБОРД
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-dash">
+  <div class="topbar">
+    <div class="topbar-title">Анализ нарушений</div>
+    <select style="font-size:11px;border:1px solid var(--gray200);border-radius:var(--r-sm);padding:4px 8px;background:var(--white);color:var(--gray800);font-family:inherit" onchange="switchPeriod(this.value)">
+      <option value="month">Июнь 2026</option>
+      <option value="quarter">II кв. 2026</option>
+      <option value="year">2026 год</option>
+    </select>
+  </div>
+  <div class="scrollable">
+    <div class="dash-hero">
+      <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">АО «Казахтелеком» · ДПБ 2026</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+        <div class="dkpi"><div class="dkpi-n" id="d-insp">14</div><div class="dkpi-l">Инспекций</div></div>
+        <div class="dkpi"><div class="dkpi-n" id="d-viol">47</div><div class="dkpi-l">Нарушений</div></div>
+        <div class="dkpi"><div class="dkpi-n" id="d-idx">62%</div><div class="dkpi-l">Индекс ПБ</div></div>
+      </div>
+    </div>
+    <div class="seg">
+      <button class="seg-btn on" onclick="dashTab('overview',this)">Обзор</button>
+      <button class="seg-btn" onclick="dashTab('sections',this)">Разделы</button>
+      <button class="seg-btn" onclick="dashTab('regions',this)">Регионы</button>
+      <button class="seg-btn" onclick="dashTab('top',this)">Топ</button>
+    </div>
+
+    <!-- Обзор -->
+    <div id="dt-overview">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:12px 12px 4px">
+        <div class="akpi vio" style="border-radius:var(--r-md)"><div class="akpi-n" id="d-open">18</div><div class="akpi-l">Открытых</div></div>
+        <div class="akpi" style="background:var(--amber-lt);border-radius:var(--r-md)"><div class="akpi-n" style="color:var(--amber)" id="d-work">11</div><div class="akpi-l" style="color:var(--amber)">В работе</div></div>
+        <div class="akpi ok" style="border-radius:var(--r-md)"><div class="akpi-n" id="d-done">18</div><div class="akpi-l">Закрыто</div></div>
+        <div class="akpi" style="background:#FEE2E2;border-radius:var(--r-md)"><div class="akpi-n" style="color:#991B1B" id="d-over">4</div><div class="akpi-l" style="color:#991B1B">Просрочено</div></div>
+      </div>
+      <div class="sec-hdr">Динамика нарушений</div>
+      <div class="fcard"><div style="padding:12px 14px 6px" id="trend-wrap"></div></div>
+      <div class="sec-hdr">Индекс безопасности</div>
+      <div class="fcard">
+        <div class="idx-wrap">
+          <div style="font-size:11px;color:var(--gray400)">Закрыто / всего нарушений</div>
+          <div class="idx-n" id="idx-n">62%</div>
+          <div style="font-size:12px;color:var(--gray600)">Индекс производственной безопасности</div>
+          <div class="idx-bar"><div class="idx-fill" id="idx-fill" style="width:62%"></div></div>
+          <div class="idx-foot"><span>0%</span><span id="idx-prev">Пред. период: 55%</span><span>100%</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--gray100)">
+          <div style="padding:9px;text-align:center;border-right:1px solid var(--gray100)"><div style="font-size:15px;font-weight:800;color:var(--green)" id="idx-cur">62%</div><div style="font-size:10px;color:var(--gray400);margin-top:1px">Текущий</div></div>
+          <div style="padding:9px;text-align:center;border-right:1px solid var(--gray100)"><div style="font-size:15px;font-weight:800;color:var(--amber)" id="idx-prev2">55%</div><div style="font-size:10px;color:var(--gray400);margin-top:1px">Пред. период</div></div>
+          <div style="padding:9px;text-align:center"><div style="font-size:15px;font-weight:800;color:var(--blue)" id="idx-delta">+7%</div><div style="font-size:10px;color:var(--gray400);margin-top:1px">Прирост</div></div>
+        </div>
+      </div>
+      <div class="sec-hdr">Статус мероприятий</div>
+      <div class="fcard">
+        <div class="donut-wrap">
+          <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#f2f2f7" stroke-width="12"/>
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#E24B4A" stroke-width="12" stroke-dasharray="48 153" stroke-dashoffset="0" transform="rotate(-90 44 44)"/>
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#D97706" stroke-width="12" stroke-dasharray="29 172" stroke-dashoffset="-48" transform="rotate(-90 44 44)"/>
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#2D7A3A" stroke-width="12" stroke-dasharray="48 153" stroke-dashoffset="-77" transform="rotate(-90 44 44)"/>
+            <circle cx="44" cy="44" r="32" fill="none" stroke="#9B9A97" stroke-width="12" stroke-dasharray="11 190" stroke-dashoffset="-125" transform="rotate(-90 44 44)"/>
+            <text x="44" y="40" text-anchor="middle" font-size="14" font-weight="800" fill="#2C2C2A">47</text>
+            <text x="44" y="52" text-anchor="middle" font-size="9" fill="#9B9A97">нарушений</text>
+          </svg>
+          <div style="flex:1">
+            <div class="leg-row"><div class="leg-dot" style="background:#E24B4A"></div><div class="leg-lbl">Открыто</div><div class="leg-val">18</div></div>
+            <div class="leg-row"><div class="leg-dot" style="background:#D97706"></div><div class="leg-lbl">В работе</div><div class="leg-val">11</div></div>
+            <div class="leg-row"><div class="leg-dot" style="background:#2D7A3A"></div><div class="leg-lbl">Закрыто</div><div class="leg-val">18</div></div>
+            <div class="leg-row" style="margin-bottom:0"><div class="leg-dot" style="background:#9B9A97"></div><div class="leg-lbl">Просрочено</div><div class="leg-val">4</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Разделы -->
+    <div id="dt-sections" style="display:none">
+      <div class="sec-hdr">Нарушений по разделу чек-листа</div>
+      <div class="fcard">
+        <div class="bar-row"><div class="bar-lbl">Транспорт</div><div class="bar-track"><div class="bar-fill" style="width:85%;background:#E24B4A"></div></div><div class="bar-val">14</div></div>
+        <div class="bar-row"><div class="bar-lbl">Техн. пом.</div><div class="bar-track"><div class="bar-fill" style="width:60%;background:#D97706"></div></div><div class="bar-val">10</div></div>
+        <div class="bar-row"><div class="bar-lbl">Документы</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:#D97706"></div></div><div class="bar-val">7</div></div>
+        <div class="bar-row"><div class="bar-lbl">Территории</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:#2D7A3A"></div></div><div class="bar-val">5</div></div>
+        <div class="bar-row"><div class="bar-lbl">Здания</div><div class="bar-track"><div class="bar-fill" style="width:24%;background:#2D7A3A"></div></div><div class="bar-val">4</div></div>
+        <div class="bar-row"><div class="bar-lbl">Бригады</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:#2D7A3A"></div></div><div class="bar-val">3</div></div>
+        <div class="bar-row"><div class="bar-lbl">Котельные</div><div class="bar-track"><div class="bar-fill" style="width:12%;background:#9B9A97"></div></div><div class="bar-val">2</div></div>
+        <div class="bar-row"><div class="bar-lbl">Санит. пом.</div><div class="bar-track"><div class="bar-fill" style="width:12%;background:#9B9A97"></div></div><div class="bar-val">2</div></div>
+      </div>
+      <div class="sec-hdr">% нарушений от пунктов раздела</div>
+      <div class="fcard">
+        <div class="bar-row"><div class="bar-lbl">Территории</div><div class="bar-track"><div class="bar-fill" style="width:42%;background:var(--red)"></div></div><div class="bar-val" style="color:var(--red)">42%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Техн. пом.</div><div class="bar-track"><div class="bar-fill" style="width:21%;background:var(--amber)"></div></div><div class="bar-val" style="color:var(--amber)">21%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Документы</div><div class="bar-track"><div class="bar-fill" style="width:19%;background:var(--amber)"></div></div><div class="bar-val" style="color:var(--amber)">19%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Транспорт</div><div class="bar-track"><div class="bar-fill" style="width:17%;background:var(--blue)"></div></div><div class="bar-val" style="color:var(--blue)">17%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Здания</div><div class="bar-track"><div class="bar-fill" style="width:27%;background:var(--blue)"></div></div><div class="bar-val" style="color:var(--blue)">27%</div></div>
+      </div>
+    </div>
+
+    <!-- Регионы -->
+    <div id="dt-regions" style="display:none">
+      <div class="sec-hdr">Нарушений по регионам</div>
+      <div class="fcard">
+        <div class="reg-row"><div class="reg-dot" style="background:#E24B4A"></div><div class="reg-name">Восточный</div><div class="reg-bar"><div class="reg-fill" style="width:100%;background:#E24B4A"></div></div><div class="reg-val">14</div></div>
+        <div class="reg-row"><div class="reg-dot" style="background:#D97706"></div><div class="reg-name">Южный</div><div class="reg-bar"><div class="reg-fill" style="width:71%;background:#D97706"></div></div><div class="reg-val">10</div></div>
+        <div class="reg-row"><div class="reg-dot" style="background:#D97706"></div><div class="reg-name">Центральный</div><div class="reg-bar"><div class="reg-fill" style="width:64%;background:#D97706"></div></div><div class="reg-val">9</div></div>
+        <div class="reg-row"><div class="reg-dot" style="background:#2D7A3A"></div><div class="reg-name">Западный</div><div class="reg-bar"><div class="reg-fill" style="width:50%;background:#2D7A3A"></div></div><div class="reg-val">7</div></div>
+        <div class="reg-row"><div class="reg-dot" style="background:#2D7A3A"></div><div class="reg-name">Алматинский</div><div class="reg-bar"><div class="reg-fill" style="width:36%;background:#2D7A3A"></div></div><div class="reg-val">5</div></div>
+        <div class="reg-row"><div class="reg-dot" style="background:#9B9A97"></div><div class="reg-name">Северный</div><div class="reg-bar"><div class="reg-fill" style="width:14%;background:#9B9A97"></div></div><div class="reg-val">2</div></div>
+      </div>
+      <div class="sec-hdr">Индекс ПБ по регионам</div>
+      <div class="fcard">
+        <div class="bar-row"><div class="bar-lbl">Северный</div><div class="bar-track"><div class="bar-fill" style="width:80%;background:#2D7A3A"></div></div><div class="bar-val" style="color:var(--green)">80%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Алматинский</div><div class="bar-track"><div class="bar-fill" style="width:74%;background:#2D7A3A"></div></div><div class="bar-val" style="color:var(--green)">74%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Западный</div><div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--blue)"></div></div><div class="bar-val" style="color:var(--blue)">65%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Центральный</div><div class="bar-track"><div class="bar-fill" style="width:58%;background:#D97706"></div></div><div class="bar-val" style="color:var(--amber)">58%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Южный</div><div class="bar-track"><div class="bar-fill" style="width:51%;background:#D97706"></div></div><div class="bar-val" style="color:var(--amber)">51%</div></div>
+        <div class="bar-row"><div class="bar-lbl">Восточный</div><div class="bar-track"><div class="bar-fill" style="width:38%;background:var(--red)"></div></div><div class="bar-val" style="color:var(--red)">38%</div></div>
+      </div>
+    </div>
+
+    <!-- Топ нарушений -->
+    <div id="dt-top" style="display:none">
+      <div class="sec-hdr">Топ-10 повторяющихся нарушений</div>
+      <div class="fcard">
+        <div class="top-row"><div class="top-num" style="background:var(--red-lt);color:var(--red)">1</div><div class="top-text">Огнетушители не прошли перезарядку / просрочены<div class="top-npa">Приказ МЧС РК от 21.02.2022 № 55, п. 9</div></div><div class="top-cnt">9×</div></div>
+        <div class="top-row"><div class="top-num" style="background:var(--red-lt);color:var(--red)">2</div><div class="top-text">Журнал инструктажей по ПБ не заполнен / просрочен<div class="top-npa">Приказ МЧС РК от 09.06.2014 № 276, п. 9</div></div><div class="top-cnt">8×</div></div>
+        <div class="top-row"><div class="top-num" style="background:var(--amber-lt);color:var(--amber)">3</div><div class="top-text">Диэлектрические ковры отсутствуют или не испытаны<div class="top-npa">Распоряжение № 253 от 31.10.2025, п. 55</div></div><div class="top-cnt">7×</div></div>
+        <div class="top-row"><div class="top-num" style="background:var(--amber-lt);color:var(--amber)">4</div><div class="top-text">Водители не прошли предсменный медосмотр<div class="top-npa">Приказ МЗ РК от 15.10.2020 № КР ДСМ-131/2020, п. 39</div></div><div class="top-cnt">6×</div></div>
+        <div class="top-row"><div class="top-num" style="background:var(--amber-lt);color:var(--amber)">5</div><div class="top-text">Нет путевого листа или записи о техосмотре ТС<div class="top-npa">Приказ МВД РК от 30.06.2023 № 534, п. 9</div></div><div class="top-cnt">6×</div></div>
+        <div class="top-row"><div class="top-num">6</div><div class="top-text">Пути эвакуации загромождены или не обозначены<div class="top-npa">ТК РК от 23.11.2015 № 414-V, ст. 184 п. 3</div></div><div class="top-cnt">5×</div></div>
+        <div class="top-row"><div class="top-num">7</div><div class="top-text">Аптечка в транспортном средстве отсутствует<div class="top-npa">Приказ МВД РК от 30.06.2023 № 534, Прил., п. 38</div></div><div class="top-cnt">5×</div></div>
+        <div class="top-row"><div class="top-num">8</div><div class="top-text">Работники не ознакомлены с Жизненно-важными правилами<div class="top-npa">Приказ АО № 201 от 13.07.2023, п. 2</div></div><div class="top-cnt">4×</div></div>
+        <div class="top-row"><div class="top-num">9</div><div class="top-text">Горючие материалы складированы на территории<div class="top-npa">Приказ МЧС РК от 21.02.2022 № 55, п. 163</div></div><div class="top-cnt">4×</div></div>
+        <div class="top-row"><div class="top-num">10</div><div class="top-text">СИЗ не соответствуют нормам или просрочены<div class="top-npa">ТК РК от 23.11.2015 № 414-V, ст. 182, п.п. 4</div></div><div class="top-cnt">3×</div></div>
+      </div>
+      <div class="sec-hdr">Наиболее нарушаемые НПА</div>
+      <div class="fcard">
+        <div class="bar-row"><div class="bar-lbl" style="width:110px">Приказ МЧС № 55</div><div class="bar-track"><div class="bar-fill" style="width:76%;background:var(--red)"></div></div><div class="bar-val">16</div></div>
+        <div class="bar-row"><div class="bar-lbl" style="width:110px">Расп. АО № 253</div><div class="bar-track"><div class="bar-fill" style="width:52%;background:#D97706"></div></div><div class="bar-val">11</div></div>
+        <div class="bar-row"><div class="bar-lbl" style="width:110px">ТК РК № 414-V</div><div class="bar-track"><div class="bar-fill" style="width:43%;background:#D97706"></div></div><div class="bar-val">9</div></div>
+        <div class="bar-row"><div class="bar-lbl" style="width:110px">Приказ МВД № 534</div><div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--blue)"></div></div><div class="bar-val">7</div></div>
+        <div class="bar-row"><div class="bar-lbl" style="width:110px">Расп. АО № 288</div><div class="bar-track"><div class="bar-fill" style="width:19%;background:#9B9A97"></div></div><div class="bar-val">4</div></div>
+      </div>
+      <div style="height:10px"></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="ntab" onclick="mainTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная</button>
+    <button class="ntab on" onclick="mainTab('dash')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Дашборд</button>
+    <button class="ntab" onclick="mainTab('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>История</button>
+    <button class="ntab" onclick="mainTab('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 10 — ИСТОРИЯ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-history">
+  <div class="topbar"><div class="topbar-title">История инспекций</div></div>
+  <div class="scrollable" style="padding:12px">
+    <div class="hist-card">
+      <div class="hist-row"><div class="hist-icon" style="background:var(--blue-lt)">🚛</div><div style="flex:1"><div class="hist-title">Транспортные подразделения</div><div class="hist-sub">05.06.2026 · Астанинский филиал · 83 пункта · 5 нарушений</div></div><span class="badge b-done">Закрыт</span></div>
+      <div class="hist-prog"><div class="hist-fill" style="width:94%;background:var(--green)"></div></div>
+    </div>
+    <div class="hist-card">
+      <div class="hist-row"><div class="hist-icon" style="background:var(--purple-lt)">🖥</div><div style="flex:1"><div class="hist-title">Технологические помещения</div><div class="hist-sub">01.06.2026 · Алматинский филиал · 47 пунктов · 3 нарушения</div></div><span class="badge b-work">В работе</span></div>
+      <div class="hist-prog"><div class="hist-fill" style="width:100%;background:var(--amber)"></div></div>
+    </div>
+    <div class="hist-card">
+      <div class="hist-row"><div class="hist-icon" style="background:var(--blue-lt)">🏭</div><div style="flex:1"><div class="hist-title">Производственные территории</div><div class="hist-sub">25.05.2026 · Восточный филиал · 12 пунктов · 1 нарушение</div></div><span class="badge b-done">Закрыт</span></div>
+      <div class="hist-prog"><div class="hist-fill" style="width:100%;background:var(--green)"></div></div>
+    </div>
+    <div class="hist-card">
+      <div class="hist-row"><div class="hist-icon" style="background:var(--teal-lt)">🏢</div><div style="flex:1"><div class="hist-title">Здания и помещения</div><div class="hist-sub">18.05.2026 · Южный филиал · 15 пунктов · 4 нарушения</div></div><span class="badge b-open">Открыт</span></div>
+      <div class="hist-prog"><div class="hist-fill" style="width:100%;background:var(--red)"></div></div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="ntab" onclick="mainTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная</button>
+    <button class="ntab" onclick="mainTab('dash')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Дашборд</button>
+    <button class="ntab on" onclick="mainTab('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>История</button>
+    <button class="ntab" onclick="mainTab('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ЭКРАН 11 — ПРОФИЛЬ
+═══════════════════════════════════════ -->
+<div class="screen" id="sc-profile">
+  <div class="topbar"><div class="topbar-title">Профиль</div></div>
+  <div class="scrollable">
+    <div style="display:flex;align-items:center;gap:14px;padding:20px 14px;background:var(--white);border-bottom:1px solid var(--gray100)">
+      <div class="prof-ava">АС</div>
+      <div>
+        <div style="font-size:17px;font-weight:800;color:var(--gray800)">Айдос Сейткали</div>
+        <div style="font-size:13px;color:var(--gray400)">Инспектор по ОТ/ПБ</div>
+        <div style="font-size:12px;color:var(--gray400);margin-top:1px">ДПБ-филиал АО «Казахтелеком» · Астана</div>
+      </div>
+    </div>
+    <div style="background:var(--white);margin-top:8px">
+      <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39M10.71 5.05A16 16 0 0122.56 9M1.42 9a15.91 15.91 0 014.7-2.88M12 20h.01"/></svg></div><span class="prof-lbl">Офлайн-режим</span><span class="prof-val on">Включён</span></div>
+      <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><span class="prof-lbl">Push-уведомления</span><span class="prof-val on">Включены</span></div>
+      <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></div><span class="prof-lbl">Синхронизация</span><span class="prof-val">2 мин. назад</span></div>
+      <div class="prof-row"><div class="prof-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><span class="prof-lbl">Версия</span><span class="prof-val">1.0.0</span></div>
+    </div>
+    <div style="padding:12px">
+      <button class="btn-secondary" style="color:var(--red);border-color:var(--red)" onclick="doLogout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Выйти из аккаунта
+      </button>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="ntab" onclick="mainTab('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная</button>
+    <button class="ntab" onclick="mainTab('dash')"><svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>Дашборд</button>
+    <button class="ntab" onclick="mainTab('history')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>История</button>
+    <button class="ntab on" onclick="mainTab('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Профиль</button>
+  </div>
+</div>
+
+</div><!-- /app -->
+<script>
+// ═══════════════ DATA ═══════════════
+const REGIONS = {
+  'Алматинский':{oblasts:['г. Алматы','Алматинская область','Жетысуская область'],filials:{'г. Алматы':'Алматинский филиал АО «Казахтелеком»','Алматинская область':'Алматинский филиал АО «Казахтелеком»','Жетысуская область':'Алматинский филиал АО «Казахтелеком»'}},
+  'Восточный':{oblasts:['Восточно-Казахстанская область','Абайская область','Павлодарская область'],filials:{'Восточно-Казахстанская область':'Восточный филиал АО «Казахтелеком»','Абайская область':'Восточный филиал АО «Казахтелеком»','Павлодарская область':'Восточный филиал АО «Казахтелеком»'}},
+  'Западный':{oblasts:['Атырауская область','Мангистауская область','Западно-Казахстанская область','Актюбинская область'],filials:{'Атырауская область':'Западный филиал АО «Казахтелеком»','Мангистауская область':'Западный филиал АО «Казахтелеком»','Западно-Казахстанская область':'Западный филиал АО «Казахтелеком»','Актюбинская область':'Западный филиал АО «Казахтелеком»'}},
+  'Северный':{oblasts:['Северо-Казахстанская область','Костанайская область'],filials:{'Северо-Казахстанская область':'Северный филиал АО «Казахтелеком»','Костанайская область':'Северный филиал АО «Казахтелеком»'}},
+  'Центральный':{oblasts:['г. Астана','Акмолинская область','Карагандинская область','Улытауская область'],filials:{'г. Астана':'Астанинский филиал АО «Казахтелеком»','Акмолинская область':'Астанинский филиал АО «Казахтелеком»','Карагандинская область':'Центральный филиал АО «Казахтелеком»','Улытауская область':'Центральный филиал АО «Казахтелеком»'}},
+  'Южный':{oblasts:['г. Шымкент','Туркестанская область','Жамбылская область','Кызылординская область'],filials:{'г. Шымкент':'Южный филиал АО «Казахтелеком»','Туркестанская область':'Южный филиал АО «Казахтелеком»','Жамбылская область':'Южный филиал АО «Казахтелеком»','Кызылординская область':'Южный филиал АО «Казахтелеком»'}}
+};
+const DEPTS=['ЦТО МС (Центр технического обслуживания)','Транспортный цех','Служба безопасности и охраны труда','Технический центр (узел связи)','Административно-хозяйственный отдел','Отдел эксплуатации сети','Энергомеханический отдел','Линейно-кабельный участок'];
+
+const SECTIONS_DATA=[
+  {id:'ter',      icon:'🏭', bg:'#E8F1FB', title:'Производственные территории',     sub:'12 пунктов · Приказ МЧС № 55'},
+  {id:'zdanie',   icon:'🏢', bg:'#E1F5EE', title:'Здания и помещения',              sub:'15 пунктов · Приказ МЧС № 55, СанПиН'},
+  {id:'tekh',     icon:'🖥', bg:'#EEEDFE', title:'Технологические помещения',        sub:'47 пунктов · Распоряжение № 253'},
+  {id:'sanit',    icon:'🚿', bg:'#E6F4E8', title:'Санитарно-бытовые помещения',      sub:'20 пунктов · СТ АО 80429-1/019-2024'},
+  {id:'kotel',    icon:'🔥', bg:'#FEF3C7', title:'Котельные и резервуары',           sub:'20 пунктов · Приказ МИиР № 358'},
+  {id:'transport',icon:'🚛', bg:'#FAECE7', title:'Транспортные подразделения',        sub:'83 пункта · ПДД РК, Распоряжение № 288'},
+  {id:'docs',     icon:'📋', bg:'#F1EFE8', title:'Документация по ПБ',               sub:'36 пунктов · ТК РК, Приказ МЗСР № 1019'},
+  {id:'brigady',  icon:'👷', bg:'#E8F1FB', title:'Оснащение бригад',                 sub:'26 пунктов · ТК РК, Распоряжение № 200'}
+];
+
+const ITEMS={
+  ter:[
+    {n:1,t:'Наличие схем и знаков передвижения ТС по территории Общества',npa:'Распоряжение № 288 от 03.12.2025, п. 7.7.1'},
+    {n:2,t:'Наличие указателей «Место сбора работников в случае ЧС»',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 58'},
+    {n:3,t:'Складирование горючих материалов и мусора на территории',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 163'},
+    {n:4,t:'Наличие доступа к пожарным гидрантам на территории зданий',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 164'},
+    {n:5,t:'Наличие и укомплектованность противопожарных щитов',npa:'Приказ МЧС РК от 21.02.2022 № 55, Гл. 1, п. 18, Прил. 3'},
+    {n:6,t:'Обозначение места табакокурения (огнетушитель, урна, табличка)',npa:'Приказ МЧС РК от 21.02.2022 № 55, Разд. 1, Гл. 1, п. 58'},
+    {n:7,t:'Наличие падающих предметов (конструкций крыши, снега, льда)',npa:'ТК РК от 23.11.2015 № 414-V, ст. 182 п. 15; ст. 184 п. 4'},
+    {n:8,t:'Надлежащее состояние дорог и тротуаров (без рытвин, ям)',npa:'ТК РК от 23.11.2015 № 414-V, ст. 184 п. 4'},
+    {n:9,t:'Очищена ли поверхность от снега',npa:'ТК РК от 23.11.2015 № 414-V, ст. 184 п. 4'},
+    {n:10,t:'Удалён ли лёд с поверхности',npa:'ТК РК от 23.11.2015 № 414-V, ст. 184 п. 4'},
+    {n:11,t:'Посыпана ли территория противоскользящими средствами при гололедице',npa:'ТК РК, ст. 184 п. 4; Коллективный договор от 14.03.2025, Разд. 6, п. 37'},
+    {n:12,t:'Обеспечено ли электроосвещение на территории в ночное время',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 166'}
+  ],
+  transport:[
+    {n:115,t:'Наличие путевого листа',npa:'Приказ МВД РК от 30.06.2023 № 534 (ПДД), п. 9, п.п. 1, Гл. 2'},
+    {n:116,t:'Наличие удостоверения по БиОТ для водителя',npa:'Распоряжение АО № 253 от 31.10.2025, п. 23'},
+    {n:119,t:'Отметка о прохождении предсменного медосмотра в путевом листе',npa:'Приказ и.о. МЗ РК от 15.10.2020 № КР ДСМ-131/2020, Прил. 2, §3, п. 39'},
+    {n:121,t:'Медицинская аптечка в транспортном средстве',npa:'Приказ МВД РК от 30.06.2023 № 534, Прил., п. 38, п.п. 1, Гл. 7'},
+    {n:122,t:'Огнетушитель в транспортном средстве',npa:'Приказ МВД РК от 30.06.2023 № 534, Прил., п. 38, п.п. 1, Гл. 7'},
+    {n:124,t:'Знак аварийной остановки в транспортном средстве',npa:'Приказ МВД РК от 30.06.2023 № 534, Прил., п. 38, п.п. 1, Гл. 7'},
+    {n:137,t:'Шины соответствуют текущему сезону',npa:'ТР ТС 018/2011, п. 5.5, Гл. 5, Прил. 8'},
+    {n:139,t:'Заполняется ли чек-лист проверки перед выпуском ТС на линию',npa:'Распоряжение № 288 от 03.12.2025, п. 3.2.2'},
+    {n:171,t:'100% водителей прошли обучение «Безопасное вождение»',npa:'Распоряжение № 288 от 03.12.2025, п. 4.2.1'}
+  ],
+  tekh:[
+    {n:28,t:'Способ прокладки кабелей соответствует требованиям ПБ (ПУЭ, СП, ГОСТ)',npa:'Распоряжение № 253 от 31.10.2025 (ДПБ/П-20-02-05), п. 31'},
+    {n:30,t:'На табличках указаны категории взрыво- и пожаробезопасности помещений',npa:'Приказ МЧС РК от 21.02.2022 № 55, пп. 17, 357; Распоряжение № 253, п. 32'},
+    {n:33,t:'Заземляющие устройства соответствуют требованиям ПУЭ и ГОСТ',npa:'Распоряжение № 253 от 31.10.2025 (ДПБ/П-20-02-05), п. 36'},
+    {n:35,t:'Наличие медицинской аптечки первой помощи',npa:'Распоряжение № 253 от 31.10.2025 (ДПБ/П-20-02-05), п. 41'},
+    {n:40,t:'Диэлектрические ковры перед стойками с напряжением выше 42 В',npa:'Распоряжение № 253 от 31.10.2025 (ДПБ/П-20-02-05), п. 55'},
+    {n:41,t:'Наличие системы автоматического газового пожаротушения в гермозоне',npa:'Распоряжение № 253 от 31.10.2025 (ДПБ/П-20-02-05), п. 58'}
+  ],
+  docs:[
+    {n:198,t:'Удостоверение о проверке знаний работы в электроустановках',npa:'Приказ Министра энергетики РК от 19.03.2015 № 222, Прил. 15, пп. 1, 2'},
+    {n:199,t:'Удостоверение о проверке знаний по БиОТ (производственный персонал)',npa:'Приказ МЗСР РК от 25.12.2015 № 1019, п. 17'},
+    {n:204,t:'Приказ о назначении ответственных за пожарную безопасность',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 4'},
+    {n:217,t:'Журнал регистрации инструктажа по БиОТ на рабочем месте',npa:'Приказ МЗСР РК от 25.12.2015 № 1019, п. 56; Распоряжение № 253, п. 62'},
+    {n:218,t:'Журнал регистрации инструктажа по пожарной безопасности',npa:'Приказ МЧС РК от 09.06.2014 № 276, п. 9'},
+    {n:229,t:'Наличие нарядов-допусков',npa:'Приказ МТСЗН РК от 28.08.2020 № 344, п. 3'}
+  ],
+  sanit:[
+    {n:75,t:'Наличие душевых помещений для производственного персонала',npa:'СТ АО 80429-1/019-2024, п. 6.3; Приказ АО № 245 от 17.09.2024'},
+    {n:81,t:'Уборные не далее 75 метров от рабочего места',npa:'СТ АО 80429-1/019-2024, п. 5.10; Приказ АО № 245 от 17.09.2024'},
+    {n:87,t:'Наличие гардеробных помещений',npa:'СТ АО 80429-1/019-2024, п. 6.3; Приказ АО № 245 от 17.09.2024'},
+    {n:91,t:'Наличие комнаты приёма пищи',npa:'СТ АО 80429-1/019-2024, п. 6.3; Приказ АО № 245 от 17.09.2024'},
+    {n:92,t:'Наличие системы вентиляции в помещениях приёма пищи',npa:'СТ АО 80429-1/019-2024, п. 6.11; Приказ АО № 245 от 17.09.2024'}
+  ],
+  kotel:[
+    {n:95,t:'Наличие паспорта от завода-изготовителя на котельные установки',npa:'Приказ МИиР РК от 30.12.2014 № 358, пп. 678, 679'},
+    {n:96,t:'Наличие паспорта на резервуар для хранения дизтоплива',npa:'Приказ МЧС РК от 15.06.2021 № 286, пп. 258, 263'},
+    {n:97,t:'Наличие заземления резервуара',npa:'Приказ МЧС РК от 15.06.2021 № 286, п. 312, п.п. 2'},
+    {n:109,t:'Наличие предохранительного клапана',npa:'Приказ МИиР РК от 30.12.2014 № 358, п. 690'},
+    {n:111,t:'Наличие манометра',npa:'Приказ МЧС РК от 15.06.2021 № 286, п. 38, п.п. 4'}
+  ],
+  zdanie:[
+    {n:13,t:'Наличие первичных средств пожаротушения в зданиях',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 18'},
+    {n:14,t:'Соответствие количества огнетушителей нормативным требованиям',npa:'Приказ МЧС РК от 21.02.2022 № 55, Прил. 3'},
+    {n:16,t:'Проверены сроки годности и исправность огнетушителей',npa:'Приказ МЧС РК от 21.02.2022 № 55, Гл. 1, п. 9'},
+    {n:22,t:'Надлежащее состояние путей эвакуации (коридоры, переходы)',npa:'ТК РК от 23.11.2015 № 414-V, ст. 184 п. 3'},
+    {n:25,t:'Планы эвакуации соответствуют актуальной планировке',npa:'Приказ МЧС РК от 21.02.2022 № 55, Прил. 2'},
+    {n:26,t:'Свободный доступ к аварийным выходам',npa:'Приказ МЧС РК от 21.02.2022 № 55, п. 24, п.п. 6'}
+  ],
+  brigady:[
+    {n:234,t:'Работники обеспечены специальной одеждой по установленным нормам',npa:'ТК РК от 23.11.2015 № 414-V, ст. 182, п.п. 4; Коллективный договор АО, Прил. 8'},
+    {n:235,t:'Работники применяют СИЗ при работах с повышенной опасностью',npa:'ТК РК от 23.11.2015 № 414-V, ст. 181, п.п. 6; Распоряжение АО № 200, пп. 4, 13'},
+    {n:247,t:'ПАБ/ПДБ проводятся руководителями структурного подразделения',npa:'Распоряжение АО № 180 от 07.08.2025, п. 18'},
+    {n:249,t:'Тематические собрания по БиОТ проводятся ежемесячно',npa:'Распоряжение АО № 3 от 08.01.2026, п. 3'},
+    {n:253,t:'Работники ознакомлены с Жизненно-важными правилами',npa:'Приказ АО № 201 от 13.07.2023, п. 2'}
+  ]
+};
+
+const PERIODS={
+  month:{insp:14,viol:47,idx:62,open:18,work:11,done:18,over:4,prev:55,trend:[{m:'Март',v:15},{m:'Апр',v:13},{m:'Май',v:12},{m:'Июнь',v:11}]},
+  quarter:{insp:38,viol:124,idx:67,open:31,work:22,done:62,over:9,prev:58,trend:[{m:'Янв',v:38},{m:'Фев',v:33},{m:'Март',v:28},{m:'Апр',v:25}]},
+  year:{insp:112,viol:381,idx:71,open:44,work:67,done:247,over:23,prev:63,trend:[{m:'2023',v:520},{m:'2024',v:412},{m:'2025',v:398},{m:'2026',v:381}]}
+};
+
+// ═══════════════ STATE ═══════════════
+let curSec=null, ans={}, cmts={}, selMgrData=null, actViols=[];
+
+// ═══════════════ NAVIGATION ═══════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function mainTab(tab){
+  const map={home:'sc-home',dash:'sc-dash',history:'sc-history',profile:'sc-profile'};
+  showScreen(map[tab]);
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll(`[onclick="mainTab('${tab}')"]`).forEach(b=>b.classList.add('on'));
+}
+
+function goHome(){ mainTab('home'); }
+
+// ═══════════════ LOGIN ═══════════════
+function doLogin(){
+  buildHomeCards();
+  buildSectionCards();
+  showScreen('sc-home');
+}
+function doLogout(){ showScreen('sc-login'); }
+
+// ═══════════════ HOME CARDS ═══════════════
+function buildHomeCards(){
+  document.getElementById('home-sections').innerHTML = SECTIONS_DATA.map(s=>`
+    <div style="background:var(--white);border-radius:var(--r-lg);border:1px solid var(--gray200);padding:13px;cursor:pointer;display:flex;align-items:center;gap:11px" onclick="showScreen('sc-newform'); document.getElementById('sc-newform').dataset.presec='${s.id}'">
+      <div style="width:40px;height:40px;border-radius:var(--r-md);background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${s.icon}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--gray800)">${s.title}</div><div style="font-size:12px;color:var(--gray400);margin-top:2px">${s.sub}</div></div>
+      <svg style="width:16px;height:16px;stroke:var(--gray400);fill:none;stroke-width:2;flex-shrink:0" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`).join('');
+}
+
+function buildSectionCards(){
+  document.getElementById('section-cards').innerHTML = SECTIONS_DATA.map(s=>`
+    <div style="background:var(--white);border-radius:var(--r-lg);border:1px solid var(--gray200);padding:13px;cursor:pointer;display:flex;align-items:center;gap:11px" onclick="openChecklist('${s.id}')">
+      <div style="width:40px;height:40px;border-radius:var(--r-md);background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${s.icon}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--gray800)">${s.title}</div><div style="font-size:12px;color:var(--gray400);margin-top:2px">${s.sub}</div></div>
+      <svg style="width:16px;height:16px;stroke:var(--gray400);fill:none;stroke-width:2;flex-shrink:0" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`).join('');
+}
+
+// ═══════════════ NEW INSPECTION ═══════════════
+function startNew(sectionId){
+  showScreen('sc-newform');
+  if(sectionId){
+    document.getElementById('sc-newform').dataset.presec = sectionId;
+  }
+}
+
+function onRegion(){
+  const rKey=document.getElementById('f-region').value;
+  const oSel=document.getElementById('f-oblast');
+  const fSel=document.getElementById('f-filial');
+  const dSel=document.getElementById('f-dept');
+  document.getElementById('f-region').classList.toggle('ph',!rKey);
+  oSel.innerHTML='<option value="">Выберите область...</option>';
+  fSel.innerHTML='<option value="">Сначала выберите область...</option>';
+  dSel.innerHTML='<option value="">Сначала выберите филиал...</option>';
+  oSel.disabled=!rKey; fSel.disabled=true; dSel.disabled=true;
+  [oSel,fSel,dSel].forEach(s=>s.classList.add('ph'));
+  document.getElementById('f-city').value='';
+  if(rKey&&REGIONS[rKey]) REGIONS[rKey].oblasts.forEach(o=>{ const op=document.createElement('option'); op.value=o; op.textContent=o; oSel.appendChild(op); });
+}
+
+function onOblast(){
+  const rKey=document.getElementById('f-region').value;
+  const oVal=document.getElementById('f-oblast').value;
+  const fSel=document.getElementById('f-filial');
+  const dSel=document.getElementById('f-dept');
+  document.getElementById('f-oblast').classList.toggle('ph',!oVal);
+  fSel.innerHTML='<option value="">Выберите филиал...</option>';
+  dSel.innerHTML='<option value="">Сначала выберите филиал...</option>';
+  fSel.disabled=!oVal; dSel.disabled=true;
+  [fSel,dSel].forEach(s=>s.classList.add('ph'));
+  if(oVal&&rKey&&REGIONS[rKey]&&REGIONS[rKey].filials[oVal]){
+    const city=document.getElementById('f-city');
+    if(!city.value) city.value=oVal.replace('г. ','').replace(' область','');
+    const fn=REGIONS[rKey].filials[oVal];
+    const op=document.createElement('option'); op.value=fn; op.textContent=fn; fSel.appendChild(op);
+    fSel.value=fn; fSel.classList.remove('ph'); onFilial();
+  }
+}
+
+function onFilial(){
+  const fVal=document.getElementById('f-filial').value;
+  const dSel=document.getElementById('f-dept');
+  document.getElementById('f-filial').classList.toggle('ph',!fVal);
+  dSel.innerHTML='<option value="">Выберите подразделение...</option>';
+  dSel.disabled=!fVal; dSel.classList.add('ph');
+  if(fVal) DEPTS.forEach(d=>{ const op=document.createElement('option'); op.value=d; op.textContent=d; dSel.appendChild(op); });
+}
+
+function goChooseSection(){
+  const region=document.getElementById('f-region').value;
+  const oblast=document.getElementById('f-oblast').value;
+  const city=document.getElementById('f-city').value.trim();
+  const address=document.getElementById('f-address').value.trim();
+  const filial=document.getElementById('f-filial').value;
+  const dept=document.getElementById('f-dept').value;
+  const inspector=document.getElementById('f-inspector').value.trim();
+  const position=document.getElementById('f-position').value.trim();
+  const date=document.getElementById('f-date').value;
+  const err=document.getElementById('err-form');
+  if(!region||!oblast||!city||!address||!filial||!dept||!inspector||!position||!date){ err.classList.add('show'); return; }
+  err.classList.remove('show');
+  document.getElementById('sec-obj-label').textContent=`${city}, ${address} · ${dept}`;
+  // if came from a specific section card — open it directly
+  const presec=document.getElementById('sc-newform').dataset.presec;
+  if(presec){ delete document.getElementById('sc-newform').dataset.presec; openChecklist(presec); }
+  else { showScreen('sc-sections'); }
+}
+
+// ═══════════════ CHECKLIST ═══════════════
+function openChecklist(id){
+  curSec=id; ans={}; cmts={};
+  const sec=SECTIONS_DATA.find(s=>s.id===id);
+  document.getElementById('cl-title').textContent=sec.title;
+  renderItems(id); updProg(id);
+  showScreen('sc-checklist');
+}
+
+function renderItems(id){
+  const items=ITEMS[id]||[];
+  document.getElementById('cl-items').innerHTML=items.map((it,i)=>`
+    <div class="icard" id="ic-${i}">
+      <div class="inum">Пункт ${it.n} · ДПБ 2026</div>
+      <div class="itext">${it.t}</div>
+      <div class="inka">📎 ${it.npa}</div>
+      <div class="ans-row">
+        <button class="ans-btn yes" onclick="setA(${i},'yes')" id="ay-${i}">✓ Да</button>
+        <button class="ans-btn no"  onclick="setA(${i},'no')"  id="an-${i}">✗ Нет</button>
+        <button class="ans-btn na"  onclick="setA(${i},'na')"  id="ana-${i}">— Н/П</button>
+      </div>
+      <div id="vb-${i}" style="display:none">
+        <div class="vbox">
+          <div class="vlbl">⚠ Описание нарушения</div>
+          <textarea class="vtxt" rows="2" placeholder="Опишите нарушение..." id="vc-${i}" oninput="cmts[${i}]=this.value"></textarea>
+          <button class="photo-btn" onclick="alert('В реальном приложении откроется камера устройства')">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Сфотографировать нарушение
+          </button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setA(i,v){
+  ans[i]=v;
+  ['yes','no','na'].forEach(x=>{ const b=document.getElementById(`a${x==='yes'?'y':x==='no'?'n':'na'}-${i}`); b.className=`ans-btn ${x}${v===x?' s':''}`; });
+  document.getElementById(`ic-${i}`).className=`icard ${v}`;
+  document.getElementById(`vb-${i}`).style.display=v==='no'?'block':'none';
+  updProg(curSec);
+}
+
+function updProg(id){
+  const items=ITEMS[id]||[];
+  const total=items.length;
+  // count how many items have any answer (yes/no/na)
+  const done=items.filter((_,i)=>ans[i]==='yes'||ans[i]==='no'||ans[i]==='na').length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('cl-prog-fill').style.width=pct+'%';
+  document.getElementById('cl-prog-lbl').textContent=`${done} из ${total} пунктов`;
+  document.getElementById('cl-prog-pct').textContent=pct+'%';
+  document.getElementById('fin-btn').disabled=(done<total);
+}
+
+// ═══════════════ ACT ═══════════════
+function finishChecklist(){
+  const items=ITEMS[curSec]||[];
+  const viols=items.filter((_,i)=>ans[i]==='no');
+  const ok=items.filter((_,i)=>ans[i]==='yes').length;
+  const na=items.filter((_,i)=>ans[i]==='na').length;
+  const sec=SECTIONS_DATA.find(s=>s.id===curSec);
+  const dateStr=new Date().toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+  actViols=viols.map((it,idx)=>({item:it,comment:cmts[items.indexOf(it)]||'',deadline:''}));
+
+  document.getElementById('act-title-label').textContent=sec.title;
+  document.getElementById('act-date-label').textContent=`${dateStr} · Инспектор: Сейткали А.М.`;
+  document.getElementById('a-tot').textContent=items.length;
+  document.getElementById('a-vio').textContent=viols.length;
+  document.getElementById('a-ok').textContent=ok;
+  document.getElementById('a-na').textContent=na;
+
+  const vblock=document.getElementById('act-viols');
+  if(!viols.length){
+    vblock.innerHTML='<div style="background:var(--green-lt);border-radius:var(--r-md);padding:13px;text-align:center;color:#1A4D22;font-weight:700;font-size:14px;margin:0 12px 10px">Нарушений не выявлено</div>';
+  } else {
+    const today=new Date(); const dl=new Date(today); dl.setDate(dl.getDate()+14);
+    const dlStr=dl.toISOString().split('T')[0];
+    actViols.forEach(v=>v.deadline=dlStr);
+    vblock.innerHTML=viols.map((it,idx)=>{
+      const ci=items.indexOf(it);
+      return `<div class="vio-item" style="margin:0 12px 8px">
+        <div class="vio-n">Нарушение · Пункт ${it.n}</div>
+        <div class="vio-t">${it.t}</div>
+        <div class="vio-npa">${it.npa}</div>
+        <div class="vio-comm">${cmts[ci]||'(комментарий не добавлен)'}</div>
+        <div class="dl-row"><span class="dl-lbl">Срок устранения:</span><input type="date" class="dl-inp" id="dl-${idx}" value="${dlStr}" onchange="actViols[${idx}].deadline=this.value"></div>
+      </div>`;
+    }).join('');
+  }
+
+  // update home stats
+  document.getElementById('kh-insp').textContent=parseInt(document.getElementById('kh-insp').textContent)+1;
+  document.getElementById('kh-viol').textContent=parseInt(document.getElementById('kh-viol').textContent)+viols.length;
+  document.getElementById('kh-open').textContent=parseInt(document.getElementById('kh-open').textContent)+viols.length;
+
+  showScreen('sc-act');
+}
+
+// ═══════════════ SEND ═══════════════
+function selMgr(row,ava,name,role){
+  document.querySelectorAll('.mgr-row').forEach(r=>{ r.querySelector('.mgr-check svg').removeAttribute('class'); });
+  row.querySelector('.mgr-check svg').setAttribute('class','sel');
+  selMgrData={ava,name,role};
+  document.getElementById('err-mgr').classList.remove('show');
+}
+
+function confirmSend(){
+  if(!selMgrData){ document.getElementById('err-mgr').classList.add('show'); return; }
+  document.getElementById('sent-sub').textContent=selMgrData.name+' получил уведомление';
+  document.getElementById('notif-p').textContent=selMgrData.name+' · push на телефон';
+  document.getElementById('notif-e').textContent=selMgrData.name+' · акт и предписание во вложении';
+  document.getElementById('sent-mgr-name').textContent=selMgrData.name+' · '+selMgrData.role;
+
+  const viols=actViols.filter(v=>v.item);
+  if(viols.length){
+    const nearestDl=viols.reduce((a,b)=>a.deadline<b.deadline?a:b).deadline;
+    document.getElementById('sent-deadline').textContent=new Date(nearestDl).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+    document.getElementById('sent-viols').innerHTML=viols.map(v=>`
+      <div style="background:var(--white);border:1px solid var(--gray200);border-radius:var(--r-sm);padding:9px 12px;margin-bottom:7px;display:flex;align-items:flex-start;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px"></div>
+        <div style="flex:1"><div style="font-size:12px;color:var(--gray800);line-height:1.4">${v.item.t}</div><div style="font-size:10px;color:var(--blue);margin-top:2px">${v.item.npa}</div></div>
+        <span style="font-size:10px;font-weight:700;background:var(--red-lt);color:var(--red);padding:2px 7px;border-radius:20px;flex-shrink:0;white-space:nowrap">До ${new Date(v.deadline).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})}</span>
+      </div>`).join('');
+  } else {
+    document.getElementById('sent-deadline').textContent='Нарушений не выявлено';
+    document.getElementById('sent-viols').innerHTML='<div style="background:var(--green-lt);border-radius:var(--r-sm);padding:10px 12px;margin:0 12px 8px;font-size:13px;color:var(--green);font-weight:700">Нарушений не выявлено</div>';
+  }
+  showScreen('sc-sent');
+}
+
+// ═══════════════ DASHBOARD ═══════════════
+function switchPeriod(p){
+  const d=PERIODS[p];
+  document.getElementById('d-insp').textContent=d.insp;
+  document.getElementById('d-viol').textContent=d.viol;
+  document.getElementById('d-idx').textContent=d.idx+'%';
+  document.getElementById('d-open').textContent=d.open;
+  document.getElementById('d-work').textContent=d.work;
+  document.getElementById('d-done').textContent=d.done;
+  document.getElementById('d-over').textContent=d.over;
+  document.getElementById('idx-n').textContent=d.idx+'%';
+  document.getElementById('idx-fill').style.width=d.idx+'%';
+  document.getElementById('idx-cur').textContent=d.idx+'%';
+  document.getElementById('idx-prev').textContent='Пред. период: '+d.prev+'%';
+  document.getElementById('idx-prev2').textContent=d.prev+'%';
+  const delta=d.idx-d.prev; document.getElementById('idx-delta').textContent=(delta>=0?'+':'')+delta+'%';
+  renderTrend(d.trend);
+}
+
+function renderTrend(rows){
+  const max=Math.max(...rows.map(r=>r.v));
+  document.getElementById('trend-wrap').innerHTML=rows.map(r=>`
+    <div class="trend-row">
+      <div class="trend-m">${r.m}</div>
+      <div class="trend-bar" style="width:${Math.round(r.v/max*68)}%"></div>
+      <div class="trend-n">${r.v}</div>
+    </div>`).join('');
+}
+
+function dashTab(tab,btn){
+  ['overview','sections','regions','top'].forEach(t=>{ document.getElementById('dt-'+t).style.display=t===tab?'block':'none'; });
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ═══════════════ PDF GENERATION ═══════════════
+function generatePdf(){
+  const items = ITEMS[curSec] || [];
+  const viols = items.filter((_,i) => ans[i] === 'no');
+  const ok    = items.filter((_,i) => ans[i] === 'yes').length;
+  const na    = items.filter((_,i) => ans[i] === 'na').length;
+  const sec   = SECTIONS_DATA.find(s => s.id === curSec) || {};
+  const dateStr = new Date().toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric'});
+
+  // Collect form data
+  const city     = document.getElementById('f-city')?.value || '—';
+  const address  = document.getElementById('f-address')?.value || '—';
+  const oblast   = document.getElementById('f-oblast')?.value || '—';
+  const region   = document.getElementById('f-region')?.value || '—';
+  const filial   = document.getElementById('f-filial')?.value || '—';
+  const dept     = document.getElementById('f-dept')?.value || '—';
+  const inspector= document.getElementById('f-inspector')?.value || 'Сейткали Айдос Маратович';
+  const position = document.getElementById('f-position')?.value || 'Инспектор по ОТ/ПБ';
+  const resp     = document.getElementById('f-resp')?.value || '—';
+
+  const violsHtml = viols.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;color:#2D7A3A;font-weight:700;padding:12px">Нарушений не выявлено</td></tr>`
+    : viols.map((it, idx) => {
+        const ci = items.indexOf(it);
+        const comm = cmts[ci] || '—';
+        const dl = document.getElementById('dl-'+idx)?.value || actViols[idx]?.deadline || '';
+        const dlStr = dl ? new Date(dl).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+        return `<tr>
+          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${it.n}</td>
+          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${it.t}</td>
+          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:11px;color:#1A5FA8">${it.npa}</td>
+          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px">${comm}</td>
+          <td style="padding:7px 8px;border:1px solid #ddd;vertical-align:top;font-size:12px;white-space:nowrap">${dlStr}</td>
+        </tr>`;
+      }).join('');
+
+  const allItemsHtml = items.map((it, i) => {
+    const a = ans[i];
+    const aLabel = a==='yes'?'Да':a==='no'?'Нет':a==='na'?'Н/П':'—';
+    const aColor = a==='yes'?'#2D7A3A':a==='no'?'#C0392B':'#6B6A67';
+    return `<tr>
+      <td style="padding:5px 8px;border:1px solid #eee;font-size:11px;color:#6B6A67">${it.n}</td>
+      <td style="padding:5px 8px;border:1px solid #eee;font-size:12px">${it.t}</td>
+      <td style="padding:5px 8px;border:1px solid #eee;font-size:11px;color:#1A5FA8">${it.npa}</td>
+      <td style="padding:5px 8px;border:1px solid #eee;font-size:12px;font-weight:700;color:${aColor};text-align:center">${aLabel}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Акт инспекции — ${sec.title || ''} — ${dateStr}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #1c1c1e; padding: 20px 28px; }
+  h1 { font-size: 16px; font-weight: 700; color: #1A5FA8; margin-bottom: 4px; }
+  h2 { font-size: 13px; font-weight: 700; margin: 18px 0 8px; text-transform: uppercase; letter-spacing: .05em; color: #6B6A67; border-bottom: 1.5px solid #eee; padding-bottom: 4px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1A5FA8; padding-bottom: 12px; margin-bottom: 14px; }
+  .org { font-size: 11px; color: #9B9A97; margin-bottom: 4px; }
+  .act-num { font-size: 11px; color: #9B9A97; text-align: right; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; margin-bottom: 14px; }
+  .meta-row { display: flex; gap: 6px; }
+  .meta-lbl { font-size: 11px; color: #9B9A97; min-width: 120px; }
+  .meta-val { font-size: 12px; font-weight: 600; color: #1c1c1e; }
+  .kpi-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  .kpi { flex: 1; border-radius: 8px; padding: 9px 12px; text-align: center; }
+  .kpi-n { font-size: 22px; font-weight: 700; }
+  .kpi-l { font-size: 10px; margin-top: 2px; }
+  .kpi.tot { background: #E8F1FB; color: #1A5FA8; }
+  .kpi.vio { background: #FDECEA; color: #C0392B; }
+  .kpi.ok  { background: #E6F4E8; color: #2D7A3A; }
+  .kpi.na  { background: #F1EFE8; color: #6B6A67; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  thead th { background: #1A5FA8; color: #fff; padding: 8px; font-size: 11px; text-align: left; border: 1px solid #1A5FA8; }
+  .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+  .sign-box { border-top: 1.5px solid #1c1c1e; padding-top: 6px; }
+  .sign-lbl { font-size: 11px; color: #9B9A97; }
+  .sign-name { font-size: 12px; font-weight: 700; margin-top: 2px; }
+  .sign-role { font-size: 11px; color: #6B6A67; }
+  .sign-line { height: 32px; border-bottom: 1px dashed #9B9A97; margin: 8px 0 4px; }
+  .no-viol { background: #E6F4E8; border-radius: 6px; padding: 12px; text-align: center; color: #2D7A3A; font-weight: 700; margin-bottom: 14px; }
+  @media print {
+    body { padding: 10px 16px; }
+    @page { margin: 12mm; size: A4; }
+    button { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="org">АО «Казахтелеком» · Чек-лист ДПБ 2026</div>
+    <h1>АКТ ИНСПЕКЦИИ</h1>
+    <div style="font-size:13px;font-weight:600;color:#1c1c1e;margin-top:3px">${sec.title || ''}</div>
+  </div>
+  <div class="act-num">
+    <div>Дата: <strong>${dateStr}</strong></div>
+    <div style="margin-top:4px">Время: <strong>${new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</strong></div>
+  </div>
+</div>
+
+<div class="meta-grid">
+  <div class="meta-row"><span class="meta-lbl">Регион:</span><span class="meta-val">${region} регион</span></div>
+  <div class="meta-row"><span class="meta-lbl">Область / город:</span><span class="meta-val">${oblast}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Населённый пункт:</span><span class="meta-val">${city}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Адрес объекта:</span><span class="meta-val">${address}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Филиал:</span><span class="meta-val">${filial}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Подразделение:</span><span class="meta-val">${dept}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Проверяющий:</span><span class="meta-val">${inspector}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Должность:</span><span class="meta-val">${position}</span></div>
+  <div class="meta-row"><span class="meta-lbl">Ответственный на объекте:</span><span class="meta-val">${resp}</span></div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi tot"><div class="kpi-n">${items.length}</div><div class="kpi-l">Пунктов</div></div>
+  <div class="kpi vio"><div class="kpi-n">${viols.length}</div><div class="kpi-l">Нарушений</div></div>
+  <div class="kpi ok"><div class="kpi-n">${ok}</div><div class="kpi-l">Соответствий</div></div>
+  <div class="kpi na"><div class="kpi-n">${na}</div><div class="kpi-l">Не применимо</div></div>
+</div>
+
+<h2>Выявленные нарушения</h2>
+${viols.length === 0
+  ? '<div class="no-viol">Нарушений не выявлено</div>'
+  : `<table>
+      <thead><tr>
+        <th style="width:40px">№ п.</th>
+        <th>Описание нарушения</th>
+        <th style="width:200px">НПА РК</th>
+        <th style="width:130px">Комментарий</th>
+        <th style="width:90px">Срок устранения</th>
+      </tr></thead>
+      <tbody>${violsHtml}</tbody>
+    </table>`
+}
+
+<h2>Все пункты проверки</h2>
+<table>
+  <thead><tr>
+    <th style="width:40px">№</th>
+    <th>Пункт проверки</th>
+    <th style="width:200px">НПА РК</th>
+    <th style="width:60px;text-align:center">Ответ</th>
+  </tr></thead>
+  <tbody>${allItemsHtml}</tbody>
+</table>
+
+<div class="sign-grid">
+  <div class="sign-box">
+    <div class="sign-lbl">Инспектор</div>
+    <div class="sign-name">${inspector}</div>
+    <div class="sign-role">${position}</div>
+    <div class="sign-line"></div>
+    <div style="font-size:10px;color:#9B9A97">Подпись / дата</div>
+  </div>
+  <div class="sign-box">
+    <div class="sign-lbl">Ответственный на объекте</div>
+    <div class="sign-name">${resp !== '—' ? resp : '________________'}</div>
+    <div class="sign-line"></div>
+    <div style="font-size:10px;color:#9B9A97">Подпись / дата</div>
+  </div>
+</div>
+
+<div style="text-align:center;margin-top:20px;font-size:10px;color:#9B9A97;border-top:1px solid #eee;padding-top:8px">
+  Сформировано системой SafetyInspect KZ · АО «Казахтелеком» · ДПБ 2026 · ${dateStr}
+</div>
+
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`;
+
+  const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if(!win){
+    // fallback: download as file
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Акт_инспекции_${(sec.title||'').replace(/\s+/g,'_')}_${dateStr.replace(/\./g,'-')}.html`;
+    a.click();
+  }
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+
+// ═══════════════ INIT ═══════════════
+buildHomeCards();
+buildSectionCards();
+switchPeriod('month');
+</script>
+</body>
+</html>
